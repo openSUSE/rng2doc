@@ -1,0 +1,16 @@
+[paths]
+source =
+   src/rng2doc
+   */site-packages/rng2doc
+
+[run]
+branch = true
+source =
+    rng2doc
+    tests
+parallel = true
+
+[report]
+show_missing = true
+precision = 2
+omit = *migrations*
