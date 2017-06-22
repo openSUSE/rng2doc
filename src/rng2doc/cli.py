@@ -15,8 +15,13 @@ Options:
                       Optional file where results are written to
 """
 
+from .common import (DEFAULT_LOGGING_DICT,
+                     LOGLEVELS,
+                     )
+
 from docopt import docopt, DocoptExit
 import logging
+from logging.config import dictConfig
 import sys
 
 #: Use __package__, not __name__ here to set overall logging level:
@@ -34,10 +39,11 @@ def parsecli(cliargs=None):
     version = "%s %s" % (__package__, __version__)
     args = docopt(__doc__,
                   argv=cliargs, version=version)
-    # dictConfig(DEFAULT_LOGGING_DICT)
-    # log.setLevel(LOGLEVELS.get(args['-v'], logging.DEBUG))
+    dictConfig(DEFAULT_LOGGING_DICT)
+    log.setLevel(LOGLEVELS.get(args['-v'], logging.DEBUG))
 
     log.debug("CLI result: %s", args)
+    log.warning("Huhu!")
     return args
 
 
