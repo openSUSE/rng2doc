@@ -5,6 +5,7 @@
 pytest
 pytest-cov
 pytest-catchlog
+tox
 
 flake8
 coverage
