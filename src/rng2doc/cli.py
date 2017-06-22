@@ -1,23 +1,65 @@
+"""Converts RELAX NG schema into documentation
+
+Usage:
+    rng2doc [-h | --help]
+    rng2doc [-v ...] [options] RNGFILE
+
+Required Arguments:
+    RNGFILE          Path to RELAX NG file (file extension .rng)
+
+Options:
+    -h, --help        Shows this help
+    -v                Raise verbosity level
+    --version         Prints the version
+    --output=<OUTFILE>, -o <OUTFILE>
+                      Optional file where results are written to
 """
-Module that contains the command line app.
 
-Why does this file exist, and why not put this in __main__?
-
-  You might be tempted to import things from __main__ later, but that will cause
-  problems: the code will get executed twice:
-
-  - When you run `python -mrng2doc` python will execute
-    ``__main__.py`` as a script. That means there won't be any
-    ``rng2doc.__main__`` in ``sys.modules``.
-  - When you import __main__ it will get executed again (as a module) because
-    there's no ``rng2doc.__main__`` in ``sys.modules``.
-
-  Also see (1) from http://click.pocoo.org/5/setuptools/#setuptools-integration
-"""
+from docopt import docopt, DocoptExit
+import logging
 import sys
 
+#: Use __package__, not __name__ here to set overall logging level:
+log = logging.getLogger(__package__)
 
-def main(argv=sys.argv):
+
+def parsecli(cliargs=None):
+    """Parse CLI arguments with docopt
+
+    :param list cliargs: List of commandline arguments
+    :return: dictionary from docopt
+    :rtype: dict
+    """
+    from rng2doc import __version__
+    version = "%s %s" % (__package__, __version__)
+    args = docopt(__doc__,
+                  argv=cliargs, version=version)
+    # dictConfig(DEFAULT_LOGGING_DICT)
+    # log.setLevel(LOGLEVELS.get(args['-v'], logging.DEBUG))
+
+    log.debug("CLI result: %s", args)
+    return args
+
+
+def main(cliargs=None):
+    """Entry point for the application script
+
+    :param list cliargs: Arguments to parse or None (=use sys.argv)
+    :return: return codes from ``ERROR_CODES``
+    """
+
+    try:
+        args = parsecli(cliargs)
+        # checkargs(args)
+        result = 0 # process(args)
+        log.info("Done.")
+        return result
+
+    except KeyboardInterrupt:
+        return 10
+
+
+def __main(argv=sys.argv):
     """
     Args:
         argv (list): List of arguments
