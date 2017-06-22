@@ -1,21 +1,44 @@
-graft docs
-graft examples
-graft src
-graft ci
-graft tests
+# For further details, see
+# https://docs.python.org/3/distutils/sourcedist.html#specifying-the-files-to-distribute
 
-include .bumpversion.cfg
-include .coveragerc
-include .cookiecutterrc
-include .editorconfig
-include .isort.cfg
+# INCLUDE IT ALL
+recursive-include docs *.rst *.py
+include docs/spelling_wordlist.txt
+include docs/requirements.txt
 
+# Docs
+include README*
+include LICENSE
 include AUTHORS.rst
 include CHANGELOG.rst
 include CONTRIBUTING.rst
-include LICENSE
-include README.rst
 
-include tox.ini .travis.yml appveyor.yml
+# Development Files & Test Suite
+include make_devsetup.sh
+include *requirements.txt
+include tox.ini
+include .bumpversion.cfg
+include .editorconfig
 
-global-exclude *.py[cod] __pycache__ *.so *.dylib
+# Check Files & Validation & Test Suite
+graft tests
+
+# Configuration files from PyCharm
+global-exclude .idea
+include .idea/misc.xml
+include .idea/modules.xml
+include  .idea/runConfigurations
+include  .idea/runConfigurations/Sphinx_HTML_Task.xml
+include  .idea/runConfigurations/Testing.xml
+include  .idea/sdsc.iml
+include  .idea/vcs.xml
+
+
+# REMOVE NONSENSE
+prune ci
+
+# Configuration files for automated testing & git repo maintenance
+global-exclude .cookiecutterrc .coveragerc .coverage .travis.yml .versionrc versionbump
+
+# Temporary files
+global-exclude *.py[cod] __pycache__ *.so *.dylib *~ *.bak *.gitignore *.doap
