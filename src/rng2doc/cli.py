@@ -63,18 +63,3 @@ def main(cliargs=None):
 
     except KeyboardInterrupt:
         return 10
-
-
-def __main(argv=sys.argv):
-    """
-    Args:
-        argv (list): List of arguments
-
-    Returns:
-        int: A return code
-
-    Does stuff.
-    """
-
-    print(argv)
-    return 0
