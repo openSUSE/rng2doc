@@ -22,6 +22,26 @@ def read(*names, **kwargs):
     ).read()
 
 
+def requires(filename):
+    """Returns a list of all pip requirements
+
+    :param filename: the Pip requirement file (usually 'requirements.txt')
+    :return: list of modules
+    :rtype: list
+    """
+    modules = []
+    with open(filename, 'r') as pipreq:
+        for line in pipreq:
+            line = line.strip()
+            if line.startswith('#') or not line:
+                continue
+            # if line.startswith('-r'):
+            # TODO: what to do here?
+            modules.append(line)
+    return modules
+
+
+# ------------------------------------------------------
 setup(
     name='rng2doc',
     version='0.1.0',
@@ -33,7 +53,7 @@ setup(
     ),
     author='Thomas Schraitle',
     author_email='tom_schr@web.de',
-    url='https://github.com/tomschr/rng2doc',
+    url='https://bitbucket.com/tomschr/rng2doc',
     packages=find_packages('src'),
     package_dir={'': 'src'},
     py_modules=[splitext(basename(path))[0] for path in glob('src/*.py')],
@@ -41,16 +61,14 @@ setup(
     zip_safe=False,
     classifiers=[
         # complete classifier list: http://pypi.python.org/pypi?%3Aaction=list_classifiers
-        'Development Status :: 5 - Production/Stable',
+        'Development Status :: 1 - Planning',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: BSD License',
         'Operating System :: Unix',
         'Operating System :: POSIX',
         'Operating System :: Microsoft :: Windows',
         'Programming Language :: Python',
-        'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
@@ -61,18 +79,22 @@ setup(
         # 'Programming Language :: Python :: Implementation :: Jython',
         # 'Programming Language :: Python :: Implementation :: Stackless',
         'Topic :: Utilities',
+        'Topic :: Documentation',
+        'Topic :: Software Development :: Documentation',
+        'Topic :: Text Processing',
+        'Topic :: Text Processing :: Markup',
+        'Topic :: Text Processing :: Markup :: XML',
     ],
     keywords=[
-        # eg: 'keyword1', 'keyword2', 'keyword3',
+        'rng', 'RELAX NG', 'documentation',
     ],
-    install_requires=[
-        # eg: 'aspectlib==1.1.1', 'six>=1.7',
-    ],
-    extras_require={
-        # eg:
-        #   'rst': ['docutils>=0.11'],
-        #   ':python_version=="2.6"': ['argparse'],
-    },
+
+    install_requires=requires('requirements.txt'),
+
+    # Required packages for using "setup.py test"
+    setup_requires=['pytest-runner'],
+    tests_require=['pytest', 'pytest-cov', 'pytest-catchlog'],
+
     entry_points={
         'console_scripts': [
             'rng2doc = rng2doc.cli:main',
