@@ -53,7 +53,12 @@ def errorcode(error):
 
 
 #: Prefix to namespace mappings
-NSMAP = dict(db="http://docbook.org/ns/docbook",
+NSMAP = dict(a="http://relaxng.org/ns/compatibility/annotations/1.0",
+             db="http://docbook.org/ns/docbook",
+             html="http://www.w3.org/1999/xhtml",
+             rng="http://relaxng.org/ns/structure/1.0",
+             s="http://purl.oclc.org/dsdl/schematron",
+             xlink="http://www.w3.org/1999/xlink"
              )
 
 #: Map verbosity to log levels
