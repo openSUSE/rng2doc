@@ -20,6 +20,7 @@ from .common import (DEFAULT_LOGGING_DICT,
                      LOGLEVELS,
                      errorcode,
                      )
+from .rng import process
 from docopt import docopt, DocoptExit, printable_usage
 import logging
 from logging.config import dictConfig
@@ -72,7 +73,7 @@ def main(cliargs=None):
         log.debug('Python version: %s', sys.version.split()[0])
         log.debug("CLI result: %s", args)
         checkargs(args)
-        result = 0 # process(args)
+        result = process(args)
         log.info("Done.")
         return result
 
