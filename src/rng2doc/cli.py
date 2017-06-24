@@ -69,7 +69,7 @@ def main(cliargs=None):
 
     try:
         args = parsecli(cliargs)
-        log.debug('%s version: %s', __package__, __version__)
+        log.info('%s version: %s', __package__, __version__)
         log.debug('Python version: %s', sys.version.split()[0])
         log.debug("CLI result: %s", args)
         checkargs(args)
