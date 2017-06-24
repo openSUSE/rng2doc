@@ -9,8 +9,8 @@ Why does this file exist, and why __main__? For more info, read:
 - https://docs.python.org/3/using/cmdline.html#cmdoption-m
 """
 import sys
-
 from rng2doc.cli import main
+
 
 if __name__ == "__main__":
     sys.exit(main())
