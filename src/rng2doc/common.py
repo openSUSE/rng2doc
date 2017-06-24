@@ -80,7 +80,6 @@ LOGNAMES = {NOTSET: 'NOTSET',      # 0
             FATAL: 'CRITICAL',     # 50
             }
 
-
 #: Default logging dict for :class:`logging.config.dictConfig`:
 DEFAULT_LOGGING_DICT = {
     'version': 1,
@@ -90,6 +89,10 @@ DEFAULT_LOGGING_DICT = {
             # See https://docs.python.org/3.5/library/logging.html#logrecord-attributes
             'format': '[%(levelname)s] %(name)s::%(funcName)s: %(message)s'
         },
+        'myformatter': {
+            '()' : 'rng2doc.log.CustomConsoleFormatter',
+            'format': '[%(levelname)s] %(message)s',
+        },
     },
     'handlers': {
         'default': {
@@ -97,11 +100,17 @@ DEFAULT_LOGGING_DICT = {
             'formatter': 'standard',
             'class': 'logging.StreamHandler',
             # 'stream': 'ext://sys.stderr',
-        },
+            },
+        'myhandler': {
+            'level': 'NOTSET',
+            'formatter': 'myformatter',
+            'class': 'logging.StreamHandler',
+            # 'stream': 'ext://sys.stderr',
+            },
     },
     'loggers': {
         'rng2doc': {
-            'handlers': ['default'],
+            'handlers': ['myhandler', ], # 'default'
             'level': 'INFO',
             'propagate': True
         }
