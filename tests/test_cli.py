@@ -27,11 +27,3 @@ def test_parsecli(cli, expected):
     result = parsecli(cli)
     # Create set difference and only compare this with the expected dictionary
     assert {item: result.get(item, None) for item in expected} == expected
-
-
-#@pytest.mark.parametrize('cli,expected', [
-#    (['-o', 'out.xml', 'in.rng'],
-#     ),
-#])
-#def test_main(cli, expected):
-#    result = main()
