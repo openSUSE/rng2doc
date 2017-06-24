@@ -15,15 +15,16 @@ Options:
                       Optional file where results are written to
 """
 
+from . import __version__
 from .common import (DEFAULT_LOGGING_DICT,
                      LOGLEVELS,
                      errorcode,
                      )
-
 from docopt import docopt, DocoptExit, printable_usage
 import logging
 from logging.config import dictConfig
 import os
+import sys
 
 #: Use __package__, not __name__ here to set overall logging level:
 log = logging.getLogger(__package__)
@@ -36,14 +37,12 @@ def parsecli(cliargs=None):
     :return: dictionary from docopt
     :rtype: dict
     """
-    from rng2doc import __version__
     version = "%s %s" % (__package__, __version__)
     args = docopt(__doc__,
                   argv=cliargs, version=version)
     dictConfig(DEFAULT_LOGGING_DICT)
     log.setLevel(LOGLEVELS.get(args['-v'], logging.DEBUG))
 
-    log.debug("CLI result: %s", args)
     return args
 
 
@@ -69,6 +68,9 @@ def main(cliargs=None):
 
     try:
         args = parsecli(cliargs)
+        log.debug('%s version: %s', __package__, __version__)
+        log.debug('Python version: %s', sys.version.split()[0])
+        log.debug("CLI result: %s", args)
         checkargs(args)
         result = 0 # process(args)
         log.info("Done.")
