@@ -6,7 +6,7 @@ from rng2doc.cli import main
 
 
 def test_main():
-    assert main([]) == 0
+    assert main([]) == 10
 
 
 def test_main_with_version(capsys):
