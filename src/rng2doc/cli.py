@@ -17,12 +17,13 @@ Options:
 
 from .common import (DEFAULT_LOGGING_DICT,
                      LOGLEVELS,
+                     errorcode,
                      )
 
-from docopt import docopt, DocoptExit
+from docopt import docopt, DocoptExit, printable_usage
 import logging
 from logging.config import dictConfig
-import sys
+import os
 
 #: Use __package__, not __name__ here to set overall logging level:
 log = logging.getLogger(__package__)
@@ -43,8 +44,20 @@ def parsecli(cliargs=None):
     log.setLevel(LOGLEVELS.get(args['-v'], logging.DEBUG))
 
     log.debug("CLI result: %s", args)
-    log.warning("Huhu!")
     return args
+
+
+def checkargs(args):
+    """Check arguments for validity
+
+    :param args:
+    :return:
+    """
+    rng = args['RNGFILE']
+    if rng is None:
+        raise DocoptExit()
+    if not os.path.exists(rng):
+        raise FileNotFoundError(rng)
 
 
 def main(cliargs=None):
@@ -56,10 +69,19 @@ def main(cliargs=None):
 
     try:
         args = parsecli(cliargs)
-        # checkargs(args)
+        checkargs(args)
         result = 0 # process(args)
         log.info("Done.")
         return result
+
+    except DocoptExit as error:
+        log.fatal("Need a RELAX NG file.")
+        printable_usage(__doc__)
+        return 10
+
+    except FileNotFoundError as error:
+        log.fatal("File not found '%s'", error)
+        return errorcode(error)
 
     except KeyboardInterrupt:
         return 10
