@@ -9,12 +9,14 @@ import pytest
 # My Stuff
 import rng2doc
 from rng2doc.cli import main
+from rng2doc.common import errorcode
 
 # log = logging.getLogger(rng2doc.__package__)
 
 
 def test_main():
-    assert main([]) == 10
+    from docopt import DocoptExit
+    assert main([]) == errorcode(DocoptExit())
 
 
 def test_main_with_version(capsys):
@@ -35,16 +37,17 @@ def test_main_with_capsys():
 
 @patch('rng2doc.cli.os.path.exists')
 def test_main_notfound_rng(mock_exists):
+    from docopt import DocoptExit
     mock_exists.return_value = False
     result = main([rng2doc.__package__, "fake.rng"])
-    assert result != 0
+    assert result == errorcode(DocoptExit())
 
 
-@patch('rng2doc.cli.os.path.exists')
-def test_main_with_KeyboardInterrupt(mock_exists):
-    mock_exists.side_effect = KeyboardInterrupt()
+@patch('rng2doc.cli.parsecli')
+def test_main_with_KeyboardInterrupt(mock_parsecli):
+    mock_parsecli.side_effect = KeyboardInterrupt
     result = main([rng2doc.__package__, "fake.rng"])
-    assert result == 10
+    assert result == errorcode(KeyboardInterrupt())
 
 
 #@pytest.mark.parametrize('cli,expected', [

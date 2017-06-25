@@ -15,3 +15,5 @@ def process(args):
     :return:
     """
     log.info("Process RNG file...")
+
+    return 0

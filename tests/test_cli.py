@@ -40,6 +40,7 @@ def test_checkargs_found_rng(mock_exists):
     mock_exists.return_value = True
     assert checkargs({'RNGFILE': 'fake.rng'}) is None
 
+
 @patch('rng2doc.cli.os.path.exists')
 def test_checkargs_notfound_rng(mock_exists):
     mock_exists.return_value = False

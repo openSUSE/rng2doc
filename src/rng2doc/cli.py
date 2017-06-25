@@ -82,11 +82,11 @@ def main(cliargs=None):
     except DocoptExit as error:
         log.fatal("Need a RELAX NG file.")
         printable_usage(__doc__)
-        return 10
+        return errorcode(error)
 
     except FileNotFoundError as error:
         log.fatal("File not found '%s'", error)
         return errorcode(error)
 
-    except KeyboardInterrupt:
-        return 10
+    except KeyboardInterrupt as error:
+        return errorcode(error)

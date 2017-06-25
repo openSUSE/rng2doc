@@ -17,6 +17,7 @@
 # you may find current contact information at www.suse.com
 
 # Third Party Libraries
+from docopt import DocoptExit
 from lxml.etree import XMLSyntaxError
 
 from logging import (CRITICAL,  # isort:skip
@@ -37,6 +38,8 @@ ERROR_CODES = dict()
 for _error, _rc in [(XMLSyntaxError, 20),
                     (FileNotFoundError, 40),
                     (OSError, 40),
+                    (DocoptExit, 50),
+                    (KeyboardInterrupt, 200),
                     ]:
     ERROR_CODES[_error] = _rc
     ERROR_CODES[repr(_error)] = _rc
