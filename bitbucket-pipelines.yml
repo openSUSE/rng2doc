@@ -8,8 +8,25 @@ image: python:3.5.1
 pipelines:
   default:
     - step:
+        caches:
+          - pip
         script: # Modify the commands below to build your repository.
           # - python3 -m venv .env && source .env/bin/activate
           - pip install -U pip
           - pip install -r devel-requirements.txt
           - tox -e py35
+  branches:
+    master:
+      - step:
+          script:
+            - pip install -U pip
+            - pip install -r devel-requirements.txt
+            - tox -e py35
+    feature/*:
+      - step:
+          caches:
+            - pip
+          script:
+            - pip install -U pip
+            - pip install -r devel-requirements.txt
+            - tox -e check,py35
