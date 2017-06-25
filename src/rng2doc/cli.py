@@ -15,17 +15,19 @@ Options:
                       Optional file where results are written to
 """
 
-from . import __version__
-from .common import (DEFAULT_LOGGING_DICT,
-                     LOGLEVELS,
-                     errorcode,
-                     )
-from .rng import process
-from docopt import docopt, DocoptExit, printable_usage
+# Standard Library
 import logging
-from logging.config import dictConfig
 import os
 import sys
+from logging.config import dictConfig
+
+# Third Party Libraries
+from docopt import DocoptExit, docopt, printable_usage
+
+# Local imports
+from . import __version__
+from .common import DEFAULT_LOGGING_DICT, LOGLEVELS, errorcode
+from .rng import process
 
 #: Use __package__, not __name__ here to set overall logging level:
 log = logging.getLogger(__package__)

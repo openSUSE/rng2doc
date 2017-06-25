@@ -1,6 +1,10 @@
-import pytest
+# Standard Library
 import os
 
+# Third Party Libraries
+import pytest
+
+# My Stuff
 import rng2doc
 from rng2doc.cli import main
 

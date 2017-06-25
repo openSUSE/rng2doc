@@ -27,11 +27,15 @@ graft tests
 global-exclude .idea
 include .idea/misc.xml
 include .idea/modules.xml
-include  .idea/runConfigurations
-include  .idea/runConfigurations/Sphinx_HTML_Task.xml
-include  .idea/runConfigurations/Testing.xml
-include  .idea/sdsc.iml
-include  .idea/vcs.xml
+include .idea/vcs.xml
+#
+# include .idea/runConfigurations
+# include .idea/runConfigurations/Sphinx_HTML_Task.xml
+# include .idea/runConfigurations/Testing.xml
+# include .idea/sdsc.iml
+
+# Exclude some specific files
+exclude bitbucket-pipelines.yml
 
 
 # REMOVE NONSENSE
