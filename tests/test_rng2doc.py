@@ -73,11 +73,13 @@ def test_main_with_success_of_process(mock_process, mock_parsecli, mock_checkarg
     result = main([rng2doc.__package__, "fake.rng"])
     assert result == 1000
 
-
-# @patch('rng2doc.cli.checkargs')
-def test_main_with_FileNotFound():  # mock_checkargs
-    # mock_checkargs.side_effect = FileNotFoundError()
+@pytest.mark.skip
+@patch('rng2doc.cli.checkargs')
+def test_main_with_FileNotFound(mock_checkargs):
+    mock_checkargs.side_effect = FileNotFoundError()
+    print(">>>>")
     result = main([rng2doc.__package__, "fake.rng"])
+    assert mock_checkargs.called
     assert result == errorcode(FileNotFoundError())
 
 
