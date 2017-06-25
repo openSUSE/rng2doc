@@ -35,12 +35,7 @@ def parserng(rngfilename, elementdef=None):
         raise NoMatchinRootException("Wrong namespace in root element %s. "
                                      "Expected namespace from RELAX NG" % root.text)
 
-    # Maybe there is a more efficient method:
-    rngelements = rngtree.xpath("//rng:define[rng:element]|/rng:element", namespaces=NSMAP)
-    alldefines = rngtree.xpath("//rng:define[not(rng:element)]", namespaces=NSMAP)
-    definedict = {node.attrib['name']: node for node in alldefines}
     result = OrderedDict()
-
     return result
 
 
