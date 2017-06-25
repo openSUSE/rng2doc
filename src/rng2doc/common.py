@@ -21,8 +21,8 @@ from lxml.etree import XMLSyntaxError
 
 from logging import (CRITICAL,  # isort:skip
                      DEBUG,
-                     FATAL,
                      ERROR,
+                     FATAL,
                      INFO,
                      NOTSET,
                      WARN,
