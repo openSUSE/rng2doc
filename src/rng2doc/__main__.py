@@ -15,4 +15,4 @@ import sys
 from rng2doc.cli import main
 
 if __name__ == "__main__":
-    sys.exit(main())
+    sys.exit(main())  # pragma: no cover
