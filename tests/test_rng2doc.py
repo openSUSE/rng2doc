@@ -5,6 +5,7 @@ from unittest.mock import patch
 
 # Third Party Libraries
 import pytest
+from docopt import DocoptExit
 
 # My Stuff
 import rng2doc
@@ -15,8 +16,16 @@ from rng2doc.common import errorcode
 
 
 def test_main():
-    from docopt import DocoptExit
     assert main([]) == errorcode(DocoptExit())
+
+
+def test_invalid():
+    assert main(["", "--wrong-option"]) == errorcode(DocoptExit())
+
+
+def test_help():
+    with pytest.raises(SystemExit):
+        main(["", "--help"])
 
 
 def test_main_with_version(capsys):
@@ -48,6 +57,28 @@ def test_main_with_KeyboardInterrupt(mock_parsecli):
     mock_parsecli.side_effect = KeyboardInterrupt
     result = main([rng2doc.__package__, "fake.rng"])
     assert result == errorcode(KeyboardInterrupt())
+
+
+@patch('rng2doc.cli.checkargs')
+@patch('rng2doc.cli.parsecli')
+@patch('rng2doc.cli.process')
+def test_main_with_success_of_process(mock_process, mock_parsecli, mock_checkargs):
+    mock_process.return_value = 1000
+    mock_parsecli.return_value = {'RNGFILE': 'fake.rng',
+                                  '--version': False,
+                                  '-v': 0,
+                                  '--output': None}
+    mock_checkargs.return_value = None
+
+    result = main([rng2doc.__package__, "fake.rng"])
+    assert result == 1000
+
+
+# @patch('rng2doc.cli.checkargs')
+def test_main_with_FileNotFound():  # mock_checkargs
+    # mock_checkargs.side_effect = FileNotFoundError()
+    result = main([rng2doc.__package__, "fake.rng"])
+    assert result == errorcode(FileNotFoundError())
 
 
 #@pytest.mark.parametrize('cli,expected', [
