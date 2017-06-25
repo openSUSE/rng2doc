@@ -1,5 +1,9 @@
+
+# Third Party Libraries
 import pytest
-from rng2doc.cli import parsecli, main
+
+# My Stuff
+from rng2doc.cli import main, parsecli
 
 
 @pytest.mark.parametrize('cli,expected', [

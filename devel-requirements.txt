@@ -6,10 +6,10 @@ pytest
 pytest-cov
 pytest-catchlog
 tox
-
+isort
 flake8
-coverage
 #
+coverage
 codecov
 coveralls
 codacy-coverage

@@ -1,7 +1,10 @@
-from .common import DEFAULT_LOGGING_DICT
+# Standard Library
 import logging
 
-DEFAULT_FORMAT=DEFAULT_LOGGING_DICT['formatters']['standard']['format']
+# Local imports
+from .common import DEFAULT_LOGGING_DICT
+
+DEFAULT_FORMAT = DEFAULT_LOGGING_DICT['formatters']['standard']['format']
 SIMPLE_FORMAT = DEFAULT_LOGGING_DICT['formatters']['myformatter']['format']
 
 

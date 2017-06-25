@@ -16,9 +16,10 @@
 # To contact SUSE about this file by physical or electronic mail,
 # you may find current contact information at www.suse.com
 
-from lxml.etree import (XMLSyntaxError)
-from logging import (# BASIC_FORMAT,
-                     CRITICAL,
+# Third Party Libraries
+from lxml.etree import XMLSyntaxError
+
+from logging import (CRITICAL,  # isort:skip
                      DEBUG,
                      FATAL,
                      ERROR,
@@ -27,7 +28,6 @@ from logging import (# BASIC_FORMAT,
                      WARN,
                      WARNING,
                      )
-import os
 
 
 # Error codes
@@ -90,7 +90,7 @@ DEFAULT_LOGGING_DICT = {
             'format': '[%(levelname)s] %(name)s::%(funcName)s: %(message)s'
         },
         'myformatter': {
-            '()' : 'rng2doc.log.CustomConsoleFormatter',
+            '()': 'rng2doc.log.CustomConsoleFormatter',
             'format': '[%(levelname)s] %(message)s',
         },
     },
@@ -110,7 +110,7 @@ DEFAULT_LOGGING_DICT = {
     },
     'loggers': {
         'rng2doc': {
-            'handlers': ['myhandler', ], # 'default'
+            'handlers': ['myhandler', ],  # 'default'
             'level': 'INFO',
             'propagate': True
         }
