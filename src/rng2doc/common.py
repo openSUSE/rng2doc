@@ -18,7 +18,7 @@
 
 # Third Party Libraries
 from docopt import DocoptExit
-from lxml.etree import XMLSyntaxError
+from lxml.etree import QName, XMLSyntaxError
 
 from logging import (CRITICAL,  # isort:skip
                      DEBUG,
@@ -63,6 +63,12 @@ NSMAP = dict(a="http://relaxng.org/ns/compatibility/annotations/1.0",
              s="http://purl.oclc.org/dsdl/schematron",
              xlink="http://www.w3.org/1999/xlink"
              )
+
+#: Some RNG elements
+RNG_ELEMENT = QName(NSMAP['rng'], "element")
+RNG_ATTRIBUTE = QName(NSMAP['rng'], "attribute")
+RNG_REF = QName(NSMAP['rng'], "ref")
+# DEFVALUE = QName(NSMAP['a'], "defaultValue")
 
 #: Map verbosity to log levels
 LOGLEVELS = {None: WARNING,  # 0
