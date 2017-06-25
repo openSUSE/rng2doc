@@ -40,7 +40,7 @@ htmlcov
 .mr.developer.cfg
 .project
 .pydevproject
-.idea
+.idea/workspace.xml
 *.iml
 *.komodoproject
 
