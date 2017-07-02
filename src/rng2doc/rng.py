@@ -42,6 +42,49 @@ def parserng(source, xmlparser=None):
     # TODO: Check for missing defines and refs (see missing-defs.xsl)
     return root, rngtree
 
+
+def rngdocumentation(element):
+    """Find documentation from element node
+
+    :param element: element node to check for documentation
+    :type element: :class:`lxml.etree._Element`
+    :return: None or element node
+    :rtype: None | :class:`lxml.etree._Element`
+    """
+    doc_element = etree.QName(NSMAP["a"], "documentation").text
+    return element.find(doc_element).text
+
+
+def rngelement(element):
+    """Find an element from the tree
+
+    :param rngtree:
+    :type rngtree: :class:`lxml.etree._ElementTree`
+    :return: None or dict
+    """
+    rng_element = etree.QName(NSMAP["rng"], "element")
+    name = element.attrib.get('name')
+    doc = rngdocumentation(element)
+
+    return {name: {'doc': doc},
+                  # {'attrib'. attrib},
+                  # {'children': None},
+            }
+
+
+def create_intermediate(rngtree):
+    """Transform RNG tree into intermediate structure for easier handling
+
+    :param rngtree:
+    :return:
+    """
+    root = etree.QName(rngtree.getroot())
+    start = {'element': rngelement,
+             # 'attribte'. rngattribute,
+             # 'grammar': rnggrammar,
+             }
+    func = start.get(root.localname)
+    result = func(rngtree.getroot())
     return result
 
 
@@ -52,6 +95,8 @@ def process(args):
     :return:
     """
     log.info("Process RNG file...")
-    result = parserng(args['RNGFILE'])
-    print(result)
+    root, rngtree = parserng(args['RNGFILE'])
+    result = create_intermediate(rngtree)
+
+    print(root.text, result)
     return 0
