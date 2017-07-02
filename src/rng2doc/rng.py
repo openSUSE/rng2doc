@@ -11,31 +11,37 @@ from lxml import etree
 
 # Local imports
 from .common import NSMAP
-from .exceptions import NoMatchinRootException
+from .exceptions import NoMatchingRootException
 
 log = logging.getLogger(__name__)
 
 #  gh://openSUSE/xmldiffng:xmldiffng/contrib/parse-rng.py
 
 
-def parserng(rngfilename, elementdef=None):
-    """Read RNG file and return a dictionary in the format of
-       { 'element': [ (name1, value1), ...], }
+def parserng(source, xmlparser=None):
+    """Read RNG source and return a tuple of its root element and the RNG tree
 
-     :param rngfilename: path to the RNG file (in XML format)
-     :type rngfilename: str
-     :return: result dictionary
-     :rtype: dict
+     :param source: The ``source`` can be any of the following:
+        * a file name/path
+        * a file object
+        * a file-like object
+        * a URL using the HTTP or FTP protocol
+     :type source: str | file | file_like | URL
+     :param xmlparser: used XMLParser (default to None)
+     :type xmlparser: :class:`lxml.etree.XMLParser`
+     :return: root element and parsed RNG tree
+     :rtype: tuple
     """
-    xmlparser = None
-    rngtree = etree.parse(rngfilename, xmlparser)
+    rngtree = etree.parse(source, xmlparser)
 
     root = etree.QName(rngtree.getroot())
     if root.namespace != NSMAP['rng']:
-        raise NoMatchinRootException("Wrong namespace in root element %s. "
-                                     "Expected namespace from RELAX NG" % root.text)
+        raise NoMatchingRootException("Wrong namespace in root element %s. "
+                                     "Expected RELAX NG namespace" % root.text)
+    # TODO: Validate tree with RNG schema
+    # TODO: Check for missing defines and refs (see missing-defs.xsl)
+    return root, rngtree
 
-    result = OrderedDict()
     return result
 
 

@@ -9,7 +9,7 @@ class RNGBaseException(Exception):
     pass
 
 
-class NoMatchinRootException(RNGBaseException):
+class NoMatchingRootException(RNGBaseException):
     """
     Raised when the root element is not a valid element from
     the RELAX NG namespace or if the root element is not
