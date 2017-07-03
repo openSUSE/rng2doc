@@ -55,20 +55,32 @@ def errorcode(error):
     return ERROR_CODES.get(repr(type(error)), 255)
 
 
+#: RELAX NG namespace
+RNG_NS = "http://relaxng.org/ns/structure/1.0"
+
 #: Prefix to namespace mappings
 NSMAP = dict(a="http://relaxng.org/ns/compatibility/annotations/1.0",
              db="http://docbook.org/ns/docbook",
              html="http://www.w3.org/1999/xhtml",
-             rng="http://relaxng.org/ns/structure/1.0",
+             rng=RNG_NS,
              s="http://purl.oclc.org/dsdl/schematron",
              xlink="http://www.w3.org/1999/xlink"
              )
 
-#: Some RNG elements
-RNG_ELEMENT = QName(NSMAP['rng'], "element")
-RNG_ATTRIBUTE = QName(NSMAP['rng'], "attribute")
-RNG_REF = QName(NSMAP['rng'], "ref")
-# DEFVALUE = QName(NSMAP['a'], "defaultValue")
+#: Some predefinied RNG elements
+RNG_ATTRIBUTE_TAG = QName(RNG_NS, "attribute")
+RNG_DATA_TAG = QName(RNG_NS, "data")
+RNG_DEFINE_TAG = QName(RNG_NS, "define")
+RNG_DIV_TAG = QName(RNG_NS, "div")
+RNG_ELEMENT_TAG = QName(RNG_NS, "element")
+RNG_GRAMMAR_TAG = QName(RNG_NS, "grammar")
+RNG_INCLUDE_TAG = QName(RNG_NS, "include")
+RNG_REF_TAG = QName(RNG_NS, "ref")
+RNG_START_TAG = QName(RNG_NS, "start")
+RNG_VALUE_TAG = QName(RNG_NS, "value")
+# RNG_DEFVALUE = QName(NSMAP['a'], "defaultValue")
+RNG_DOCUMENTATION_TAG = QName(NSMAP['a'], "documentation")
+
 
 #: Map verbosity to log levels
 LOGLEVELS = {None: WARNING,  # 0

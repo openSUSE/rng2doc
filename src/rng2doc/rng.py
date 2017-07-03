@@ -10,7 +10,7 @@ from collections import OrderedDict
 from lxml import etree
 
 # Local imports
-from .common import NSMAP
+from .common import NSMAP, RNG_NS, RNG_DOCUMENTATION_TAG, RNG_ELEMENT_TAG
 from .exceptions import NoMatchingRootException
 
 log = logging.getLogger(__name__)
@@ -35,7 +35,7 @@ def parserng(source, xmlparser=None):
     rngtree = etree.parse(source, xmlparser)
 
     root = etree.QName(rngtree.getroot())
-    if root.namespace != NSMAP['rng']:
+    if root.namespace != RNG_NS:
         raise NoMatchingRootException("Wrong namespace in root element %s. "
                                      "Expected RELAX NG namespace" % root.text)
     # TODO: Validate tree with RNG schema
@@ -51,8 +51,10 @@ def rngdocumentation(element):
     :return: None or element node
     :rtype: None | :class:`lxml.etree._Element`
     """
-    doc_element = etree.QName(NSMAP["a"], "documentation").text
-    return element.find(doc_element).text
+    doc_element = RNG_DOCUMENTATION_TAG.text
+    doc = element.find(doc_element)
+
+    return doc if doc is None else doc.text
 
 
 def rngelement(element):
@@ -62,7 +64,7 @@ def rngelement(element):
     :type rngtree: :class:`lxml.etree._ElementTree`
     :return: None or dict
     """
-    rng_element = etree.QName(NSMAP["rng"], "element")
+    rng_element = RNG_ELEMENT_TAG
     name = element.attrib.get('name')
     doc = rngdocumentation(element)
 
