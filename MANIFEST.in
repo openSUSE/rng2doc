@@ -22,6 +22,8 @@ include .editorconfig
 
 # Check Files & Validation & Test Suite
 graft tests
+recursive-include src *.py
+include src/rng2doc/checks/relaxng.rng
 
 # Configuration files from PyCharm
 global-exclude .idea
