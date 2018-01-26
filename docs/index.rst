@@ -1,6 +1,6 @@
-========
-Contents
-========
+========================
+Documentation of rng2doc
+========================
 
 .. toctree::
    :maxdepth: 2

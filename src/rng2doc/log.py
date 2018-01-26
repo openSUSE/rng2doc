@@ -8,7 +8,10 @@ import logging
 # Local imports
 from .common import DEFAULT_LOGGING_DICT
 
+#: the default logging format
 DEFAULT_FORMAT = DEFAULT_LOGGING_DICT['formatters']['standard']['format']
+
+#: a very simple format
 SIMPLE_FORMAT = DEFAULT_LOGGING_DICT['formatters']['myformatter']['format']
 
 

@@ -38,14 +38,21 @@ autosummary_generate = True
 pygments_style = 'trac'
 templates_path = [ '_templates' ]
 extlinks = {
+    'bb': ('https://bitbucket.org/tomschr/rng2doc', None),
     'issue': ('https://bitbucket.org/tomschr/rng2doc/issues/%s', '#'),
     'pr': ('https://bitbucket.org/tomschr/rng2doc/pull-requests/%s', 'PR #'),
 }
 # on_rtd is whether we are on readthedocs.org
-on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
+# on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 
 #if not on_rtd:  # only set the theme if we're building docs locally
 #    html_theme = 'sphinx_rtd_theme'
+
+html_theme = "bizstyle"
+html_theme_options = {
+    "rightsidebar": "false",
+#    "relbarbgcolor": "black"
+}
 
 html_last_updated_fmt = '%b %d, %Y'
 html_split_index = False

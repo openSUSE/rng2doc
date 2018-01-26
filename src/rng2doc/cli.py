@@ -36,8 +36,9 @@ log = logging.getLogger(__package__)
 def parsecli(cliargs=None):
     """Parse CLI arguments with docopt
 
-    :param list cliargs: List of commandline arguments
-    :return: dictionary from docopt
+    :param cliargs: List of commandline arguments
+    :type cliargs: list(str)
+    :return: dictionary from :class:`docopt.docopt`
     :rtype: dict
     """
     version = "%s %s" % (__package__, __version__)
@@ -52,7 +53,9 @@ def parsecli(cliargs=None):
 def checkargs(args):
     """Check arguments for validity
 
-    :param args:
+    :param args: parsed arguments from :class:`docopt.docopt`
+    :type args: dict
+    :raises: :class:`docopt.DocoptExit`, :class:`FileNotFoundError`
     :return:
     """
     rng = args['RNGFILE']
@@ -65,8 +68,9 @@ def checkargs(args):
 def main(cliargs=None):
     """Entry point for the application script
 
-    :param list cliargs: Arguments to parse or None (=use sys.argv)
-    :return: return codes from ``ERROR_CODES``
+    :param list(str) cliargs: Arguments to parse or None (=use ``sys.argv``)
+    :return: return codes from :func:`rng2doc.common.errorcode`
+    :rtype: int
     """
 
     try:

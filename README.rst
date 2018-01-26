@@ -9,9 +9,13 @@ Converts a RELAX NG schema into documentation (HTML).
 Installation
 ============
 
-::
+Use your package manager or use the following instructions to install it
+in a virtual environment::
 
-    pip install rng2doc
+    $ python3 -m venv .env
+    $ source .env/bin/activate
+    $ pip install -r requirements.txt
+    $ pip install rng2doc
 
 
 Development
@@ -27,7 +31,7 @@ To show the available target, run::
 
 To run a code stylecheck (``flake8``), run::
 
-    $ tox check
+    $ tox -e check
 
 Note, to combine the coverage data from all the tox environments run:
 

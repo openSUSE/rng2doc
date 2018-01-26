@@ -38,7 +38,8 @@ from logging import (CRITICAL,  # isort:skip
 # Make an error dictionary that contains both the class and its
 # string representation
 ERROR_CODES = dict()
-for _error, _rc in [(XMLSyntaxError, 20),
+for _error, _rc in [  # exception class, return value:
+                    (XMLSyntaxError, 20),
                     (FileNotFoundError, 40),
                     (OSError, 40),
                     (DocoptExit, 50),
@@ -51,7 +52,7 @@ for _error, _rc in [(XMLSyntaxError, 20),
 def errorcode(error):
     """Get the error exit code from an exception ``error``
 
-    :param error: exception instance
+    :param error: exception instance like :class:`OSError`
     :return: exit code
     :rtype: int
     """
@@ -67,10 +68,15 @@ NSMAP = dict(a="http://relaxng.org/ns/compatibility/annotations/1.0",
              xlink="http://www.w3.org/1999/xlink"
              )
 
-#: Some RNG elements
+#: RNG element ``element``
 RNG_ELEMENT = QName(NSMAP['rng'], "element")
+
+#: RNG element ``attribute``
 RNG_ATTRIBUTE = QName(NSMAP['rng'], "attribute")
+
+#: RNG element ``ref``
 RNG_REF = QName(NSMAP['rng'], "ref")
+
 # DEFVALUE = QName(NSMAP['a'], "defaultValue")
 
 #: Map verbosity to log levels

@@ -19,13 +19,14 @@ log = logging.getLogger(__name__)
 
 
 def parserng(rngfilename, elementdef=None):
-    """Read RNG file and return a dictionary in the format of
-       { 'element': [ (name1, value1), ...], }
+    """Read RNG file and return a dictionary in the format of::
+
+      { 'element': [ (name1, value1), ...], }
 
      :param rngfilename: path to the RNG file (in XML format)
      :type rngfilename: str
      :return: result dictionary
-     :rtype: dict
+     :rtype: dict(str, list(str, ...))
     """
     xmlparser = None
     rngtree = etree.parse(rngfilename, xmlparser)
@@ -42,8 +43,9 @@ def parserng(rngfilename, elementdef=None):
 def process(args):
     """Process RELAX NG file
 
-    :param args: result dictionary from docopt
-    :return:
+    :param args: result dictionary from :class:`docopt.docopt`
+    :return: result dictionary
+    :rtype: dict
     """
     rngfile = args['RNGFILE']
     log.info("Process RNG file %r...", rngfile)

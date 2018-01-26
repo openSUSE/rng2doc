@@ -8,11 +8,9 @@ Why does this file exist, and why __main__? For more info, read:
 - https://docs.python.org/2/using/cmdline.html#cmdoption-m
 - https://docs.python.org/3/using/cmdline.html#cmdoption-m
 """
-# Standard Library
-import sys
-
-# My Stuff
-from rng2doc.cli import main
 
 if __name__ == "__main__":
+    import sys
+    from rng2doc.cli import main
+
     sys.exit(main())  # pragma: no cover

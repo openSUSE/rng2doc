@@ -1,5 +1,5 @@
 """
-Exceptions
+Module for all exceptions
 """
 
 
