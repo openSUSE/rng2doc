@@ -8,6 +8,7 @@ pytest-catchlog
 tox
 isort
 flake8
+bumpversion
 #
 coverage
 codecov
