@@ -41,9 +41,9 @@ Overview
     :alt: PyPI Package latest release
     :target: https://pypi.python.org/pypi/rng2doc
 
-.. |commits-since| image:: https://img.shields.io/github/commits-since/tomschr/rng2doc/v0.1.0.svg
+.. |commits-since| image:: https://img.shields.io/github/commits-since/tomschr/rng2doc/v0.2.0.svg
     :alt: Commits since latest release
-    :target: https://github.com/tomschr/rng2doc/compare/v0.1.0...master
+    :target: https://github.com/tomschr/rng2doc/compare/v0.2.0...master
 
 .. |wheel| image:: https://img.shields.io/pypi/wheel/rng2doc.svg
     :alt: PyPI Wheel
