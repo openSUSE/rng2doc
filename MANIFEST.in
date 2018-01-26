@@ -6,6 +6,7 @@ recursive-include docs *.rst *.py
 include docs/spelling_wordlist.txt
 include docs/requirements.txt
 include docs/Makefile
+recursive-exclude docs/reference/_autosummary *.rst
 
 # Docs
 include README*

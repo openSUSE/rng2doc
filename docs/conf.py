@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 
 # Standard Library
 import os
+import sys
 
 PATH=os.path.normpath(os.path.join(os.path.dirname(__file__), "../src"))
 sys.path.insert(0, PATH)
