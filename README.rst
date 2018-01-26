@@ -1,5 +1,5 @@
 =============
-rng2doc 0.2.0
+rng2doc 0.2.1
 =============
 
 Converts a RELAX NG schema into documentation (HTML).
