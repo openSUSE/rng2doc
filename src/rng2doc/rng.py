@@ -1,4 +1,4 @@
-"""
+"""Parsing RNG file and creating intermediate structure
 
 """
 
@@ -34,7 +34,7 @@ def parserng(rngfilename, elementdef=None):
     if root.namespace != NSMAP['rng']:
         raise NoMatchinRootException("Wrong namespace in root element %s. "
                                      "Expected namespace from RELAX NG" % root.text)
-
+    # FIXME: Add something usefule here:
     result = OrderedDict()
     return result
 
@@ -45,7 +45,8 @@ def process(args):
     :param args: result dictionary from docopt
     :return:
     """
-    log.info("Process RNG file...")
-    result = parserng(args['RNGFILE'])
+    rngfile = args['RNGFILE']
+    log.info("Process RNG file %r...", rngfile)
+    result = parserng(rngfile)
     print(result)
     return 0

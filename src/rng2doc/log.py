@@ -1,3 +1,7 @@
+"""Logging module
+
+"""
+
 # Standard Library
 import logging
 

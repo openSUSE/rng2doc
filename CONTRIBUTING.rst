@@ -8,7 +8,7 @@ little bit helps, and credit will always be given.
 Bug reports
 ===========
 
-When `reporting a bug <https://github.com/tomschr/rng2doc/issues>`_ please include:
+When `reporting a bug <https://bitbucket.org/tomschr/rng2doc/issues>`_ please include:
 
     * Your operating system name and version.
     * Any details about your local setup that might be helpful in troubleshooting.
@@ -24,7 +24,7 @@ articles, and such.
 Feature requests and feedback
 =============================
 
-The best way to send feedback is to file an issue at https://github.com/tomschr/rng2doc/issues.
+The best way to send feedback is to file an issue.
 
 If you are proposing a feature:
 
@@ -37,11 +37,10 @@ Development
 
 To set up `rng2doc` for local development:
 
-1. Fork `rng2doc <https://github.com/tomschr/rng2doc>`_
-   (look for the "Fork" button).
+1. Fork the ``rng2doc`` repository (look for the "Fork" button).
 2. Clone your fork locally::
 
-    git clone git@github.com:your_name_here/rng2doc.git
+    git clone git@bitbucket.org:YOUR_BB_NAME/rng2doc.git
 
 3. Create a branch for local development::
 
@@ -59,7 +58,7 @@ To set up `rng2doc` for local development:
     git commit -m "Your detailed description of your changes."
     git push origin name-of-your-bugfix-or-feature
 
-6. Submit a pull request through the GitHub website.
+6. Submit a pull request through the BitBucket website.
 
 Pull Request Guidelines
 -----------------------
@@ -83,7 +82,7 @@ Tips
 
 To run a subset of tests::
 
-    tox -e envname -- py.test -k test_myfeature
+    tox -e ENVNAME -- py.test -k test_myfeature
 
 To run all the test environments in *parallel* (you need to ``pip install detox``)::
 

@@ -38,8 +38,8 @@ autosummary_generate = True
 pygments_style = 'trac'
 templates_path = [ '_templates' ]
 extlinks = {
-    'issue': ('https://github.com/tomschr/rng2doc/issues/%s', '#'),
-    'pr': ('https://github.com/tomschr/rng2doc/pull/%s', 'PR #'),
+    'issue': ('https://bitbucket.org/tomschr/rng2doc/issues/%s', '#'),
+    'pr': ('https://bitbucket.org/tomschr/rng2doc/pull-requests/%s', 'PR #'),
 }
 # on_rtd is whether we are on readthedocs.org
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'

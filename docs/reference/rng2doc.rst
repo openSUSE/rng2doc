@@ -1,7 +1,7 @@
-rng2doc
-=======
+API Documentation for rng2doc
+=============================
 
-This is the API documentation.
+The rng2doc package contains the following modules:
 
 .. autosummary::
    :toctree: _autosummary
@@ -11,5 +11,4 @@ This is the API documentation.
    rng2doc.common
    rng2doc.exceptions
    rng2doc.log
-   rng2doc.xslt
    rng2doc.rng
