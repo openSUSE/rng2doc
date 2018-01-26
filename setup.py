@@ -41,7 +41,7 @@ def requires(filename):
 # ------------------------------------------------------
 setup(
     name='rng2doc',
-    version='0.2.1',
+    version='0.2.2',
     license='BSD',
     description='Converts a RELAX NG schema into documentation',
     long_description='%s\n%s' % (
