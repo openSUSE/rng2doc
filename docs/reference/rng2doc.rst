@@ -1,9 +1,15 @@
 rng2doc
 =======
 
-.. testsetup::
+This is the API documentation.
 
-    from rng2doc import *
+.. autosummary::
+   :toctree: _autosummary
 
-.. automodule:: rng2doc
-    :members:
+   rng2doc
+   rng2doc.cli
+   rng2doc.common
+   rng2doc.exceptions
+   rng2doc.log
+   rng2doc.xslt
+   rng2doc.rng

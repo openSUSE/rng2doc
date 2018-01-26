@@ -2,6 +2,7 @@
 Exceptions
 """
 
+
 class RNGBaseException(Exception):
     """
     Base exception for all rng2doc related errors
