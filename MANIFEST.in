@@ -39,7 +39,6 @@ include .idea/vcs.xml
 # Exclude some specific files
 exclude bitbucket-pipelines.yml
 
-
 # REMOVE NONSENSE
 prune ci
 
