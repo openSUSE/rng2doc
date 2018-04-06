@@ -11,9 +11,7 @@ recursive-exclude docs/reference/_autosummary *.rst
 # Docs
 include README*
 include LICENSE
-include AUTHORS.rst
-include CHANGELOG.rst
-include CONTRIBUTING.rst
+include *.rst
 
 # Development Files & Test Suite
 include make_devsetup.sh
