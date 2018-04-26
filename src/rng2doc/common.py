@@ -77,7 +77,22 @@ RNG_ATTRIBUTE = QName(NSMAP['rng'], "attribute")
 #: RNG element ``ref``
 RNG_REF = QName(NSMAP['rng'], "ref")
 
-# DEFVALUE = QName(NSMAP['a'], "defaultValue")
+#: RNG element ``define``
+RNG_DEFINE = QName(NSMAP['rng'], "define")
+
+RNG_OPTIONAL = QName(NSMAP['rng'], "optional")
+
+RNG_DATA = QName(NSMAP['rng'], "data")
+
+RNG_TEXT = QName(NSMAP['rng'], "text")
+
+RNG_CHOICE = QName(NSMAP['rng'], "choice")
+
+RNG_PARAM = QName(NSMAP['rng'], "param")
+
+RNG_VALUE = QName(NSMAP['rng'], "value")
+
+A_DOC = QName(NSMAP['a'], "documentation")
 
 #: Map verbosity to log levels
 LOGLEVELS = {None: WARNING,  # 0

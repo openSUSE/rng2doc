@@ -23,6 +23,7 @@ from logging.config import dictConfig
 
 # Third Party Libraries
 from docopt import DocoptExit, docopt, printable_usage
+from lxml import etree
 
 # Local imports
 from . import __version__
@@ -65,6 +66,14 @@ def checkargs(args):
         raise FileNotFoundError(rng)
 
 
+def output(result, file_path):
+    if file_path:
+        result.write(
+            file_path, pretty_print=True, xml_declaration=True, encoding="utf-8")
+    else:
+        print(etree.tostring(result, pretty_print=True, encoding="unicode"))
+
+
 def main(cliargs=None):
     """Entry point for the application script
 
@@ -72,7 +81,6 @@ def main(cliargs=None):
     :return: return codes from :func:`rng2doc.common.errorcode`
     :rtype: int
     """
-
     try:
         args = parsecli(cliargs)
         log.info('%s version: %s', __package__, __version__)
@@ -80,8 +88,9 @@ def main(cliargs=None):
         log.debug("CLI result: %s", args)
         checkargs(args)
         result = process(args)
+        result = output(result, args['--output'])
         log.info("Done.")
-        return result
+        return 0
 
     except DocoptExit as error:
         log.fatal("Need a RELAX NG file.")
@@ -90,6 +99,10 @@ def main(cliargs=None):
 
     except FileNotFoundError as error:
         log.fatal("File not found '%s'", error)
+        return errorcode(error)
+
+    except etree.XMLSyntaxError as error:
+        log.fatal("Failed to parse the XML input file  '%s'", error)
         return errorcode(error)
 
     except KeyboardInterrupt as error:
