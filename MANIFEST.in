@@ -7,6 +7,7 @@ include docs/spelling_wordlist.txt
 include docs/requirements.txt
 include docs/Makefile
 recursive-exclude docs/reference/_autosummary *.rst
+recursive-exclude xslt *
 
 # Docs
 include README*
@@ -36,6 +37,7 @@ include .idea/vcs.xml
 
 # Exclude some specific files
 exclude bitbucket-pipelines.yml
+exclude xslt/*
 
 # REMOVE NONSENSE
 prune ci
