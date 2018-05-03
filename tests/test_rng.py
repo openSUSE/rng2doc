@@ -76,12 +76,12 @@ def test_transform(mock_parse):
      # The expected result looks like:
      # -------------------------------
      # <documentation>
-     #   <element name="root">
+     #   <element id="0" name="root">
      #     <namespace/>
      #     <description/>
-     #     <child id="test"/>
+     #     <child id="1"/>
      #   </element>
-     #   <element name="test">
+     #   <element id="1" name="test">
      #     <namespace/>
      #     <description/>
      #   </element>
@@ -92,7 +92,7 @@ def test_transform(mock_parse):
          ("boolean(//element/namespace)", True),
          ("boolean(//element/description)", True),
          ("boolean(/documentation/element[@name = 'root'])", True),
-         ("boolean(/documentation/element[@name = 'root']/child[@id = 'test'])", True),
+         ("boolean(/documentation/element[@name = 'root']/child[@id = '1'])", True),
          ("boolean(/documentation/element[@name = 'test'])", True),
      ]
 
@@ -104,17 +104,17 @@ def test_transform(mock_parse):
      # The expected result looks like:
      # -------------------------------
      # <documentation>
-     #   <element name="root">
+     #   <element id='0' name="root">
      #     <namespace/>
      #     <description/>
-     #     <child id="test1"/>
-     #     <child id="test2"/>
+     #     <child id="1"/>
+     #     <child id="2"/>
      #   </element>
-     #   <element name="test1">
+     #   <element id='1' name="test1">
      #     <namespace/>
      #     <description/>
      #   </element>
-     #   <element name="test2">
+     #   <element id='2' name="test2">
      #     <namespace/>
      #     <description/>
      #   </element>
@@ -125,8 +125,8 @@ def test_transform(mock_parse):
          ("boolean(//element/namespace)", True),
          ("boolean(//element/description)", True),
          ("boolean(/documentation/element[@name = 'root'])", True),
-         ("boolean(/documentation/element[@name = 'root']/child[@id = 'test1'])", True),
-         ("boolean(/documentation/element[@name = 'root']/child[@id = 'test2'])", True),
+         ("boolean(/documentation/element[@name = 'root']/child[@id = '1'])", True),
+         ("boolean(/documentation/element[@name = 'root']/child[@id = '2'])", True),
          ("boolean(/documentation/element[@name = 'test1'])", True),
          ("boolean(/documentation/element[@name = 'test2'])", True),
      ]
@@ -522,7 +522,7 @@ def test_transform_enumerations(xml, expected):
           </define>
         </grammar>""",
      # <documentation>
-     #   <element name="anyElement">
+     #   <element id='0' name="anyElement">
      #     <namespace/>
      #     <description/>
      #     <child id="anyElement"/>
@@ -539,12 +539,222 @@ def test_transform_enumerations(xml, expected):
          ("local-name(/*)", "documentation"),
          ("count(/documentation/element)", 1),
          ("boolean(/documentation/element[@name = 'anyElement'])", True),
-         ("boolean(/documentation/element[@name = 'anyElement']/child[1][@id = 'anyElement'])",
+         ("boolean(/documentation/element[@name = 'anyElement']/child[1][@id = '0'])",
           True),
      ]
     ),
 ])
 def test_transform_name_classes(xml, expected):
+    result = transform(io.StringIO(xml))
+    assert isinstance(result, etree._ElementTree)
+    for xpath, expected_value in expected:
+        assert result.xpath(xpath) == expected_value
+
+
+@pytest.mark.parametrize('xml,expected', [
+    ("""<grammar xmlns="http://relaxng.org/ns/structure/1.0"
+                 xmlns:trans="http://docbook.org/ns/transclusion">
+          <start>
+            <ref name="test.define"/>
+          </start>
+
+          <define name="test.define">
+            <element name="test">
+              <attribute name="trans:test_attribute"/>
+            </element>
+          </define>
+        </grammar>""",
+     # <documentation>
+     #   <element name="test">
+     #     <namespace/>
+     #     <description/>
+     #     <attribute>
+     #       <name>test_attribute</name>
+     #       <namespace>http://docbook.org/ns/transclusion</namespace>
+     #       <description/>
+     #       <type/>
+     #       <use>required</use>
+     #     </attribute>
+     #   </element>
+     # </documentation>
+     [
+         ("local-name(/*)", "documentation"),
+         ("boolean(/documentation/element[@name = 'test']/namespace/text())",
+          False),
+         ("/documentation/element[@name = 'test']/attribute/namespace/text()",
+          ["http://docbook.org/ns/transclusion"]),
+     ]
+    ),
+    ("""<grammar xmlns="http://relaxng.org/ns/structure/1.0">
+          <start>
+            <ref name="test.define"/>
+          </start>
+
+          <define name="test.define" xmlns:trans="http://docbook.org/ns/transclusion">
+            <element name="test">
+              <attribute name="trans:test_attribute"/>
+            </element>
+          </define>
+        </grammar>""",
+     # <documentation>
+     #   <element name="test">
+     #     <namespace/>
+     #     <description/>
+     #     <attribute>
+     #       <name>test_attribute</name>
+     #       <namespace>http://docbook.org/ns/transclusion</namespace>
+     #       <description/>
+     #       <type/>
+     #       <use>required</use>
+     #     </attribute>
+     #   </element>
+     # </documentation>
+     [
+         ("local-name(/*)", "documentation"),
+         ("boolean(/documentation/element[@name = 'test']/namespace/text())",
+          False),
+         ("/documentation/element[@name = 'test']/attribute/namespace/text()",
+          ["http://docbook.org/ns/transclusion"]),
+     ]
+    ),
+    ("""<grammar xmlns="http://relaxng.org/ns/structure/1.0"
+                 xmlns:trans="http://docbook.org/ns/transclusion">
+          <start>
+            <ref name="test.define"/>
+          </start>
+
+          <define name="test.define">
+            <element name="trans:test">
+              <attribute name="test_attribute"/>
+            </element>
+          </define>
+        </grammar>""",
+     # <documentation>
+     #   <element name="test">
+     #     <namespace>http://docbook.org/ns/transclusion</namespace>
+     #     <description/>
+     #     <attribute>
+     #       <name>test_attribute</name>
+     #       <namespace/>
+     #       <description/>
+     #       <type/>
+     #       <use>required</use>
+     #     </attribute>
+     #   </element>
+     # </documentation>
+     [
+         ("local-name(/*)", "documentation"),
+         ("/documentation/element[@name = 'trans:test']/namespace/text()",
+          ["http://docbook.org/ns/transclusion"]),
+         ("/documentation/element[@name = 'trans:test']/attribute/namespace/text()",
+          []),
+     ]
+    ),
+    ("""<grammar xmlns="http://relaxng.org/ns/structure/1.0">
+          <start>
+            <ref name="test.define"/>
+          </start>
+
+          <define name="test.define">
+            <element name="test" ns="http://www.example.com">
+              <attribute name="test_attribute"/>
+            </element>
+          </define>
+        </grammar>""",
+     # <documentation>
+     #   <element id='0' name="test">
+     #     <namespace>http://www.example.com</namespace>
+     #     <description/>
+     #     <attribute>
+     #       <name>test_attribute</name>
+     #       <namespace/>
+     #       <description/>
+     #       <type/>
+     #       <use>required</use>
+     #     </attribute>
+     #   </element>
+     # </documentation>
+     [
+         ("local-name(/*)", "documentation"),
+         ("/documentation/element[@name = 'test']/namespace/text()",
+          ["http://www.example.com"]),
+         ("/documentation/element[@name = 'test']/attribute/namespace/text()",
+          []),
+     ]
+    ),
+    ("""<grammar xmlns="http://relaxng.org/ns/structure/1.0">
+          <start>
+            <ref name="test.define"/>
+          </start>
+
+          <define name="test.define">
+            <element name="test" ns="">
+              <attribute name="test_attribute"/>
+            </element>
+          </define>
+        </grammar>""",
+     # <documentation>
+     #   <element id='0' name="test">
+     #     <namespace/>
+     #     <description/>
+     #     <attribute>
+     #       <name>test_attribute</name>
+     #       <namespace/>
+     #       <description/>
+     #       <type/>
+     #       <use>required</use>
+     #     </attribute>
+     #   </element>
+     # </documentation>
+     [
+         ("local-name(/*)", "documentation"),
+         ("/documentation/element[@name = 'test']/namespace/text()",
+          []),
+         ("/documentation/element[@name = 'test']/attribute/namespace/text()",
+          []),
+     ]
+    ),
+    ("""<grammar xmlns="http://relaxng.org/ns/structure/1.0">
+          <start>
+            <ref name="test.define"/>
+          </start>
+
+          <define name="test.define">
+            <element name="test1" ns="http://www.example.com">
+              <attribute name="test_attribute1"/>
+              <element name="test2">
+                <attribute name="test_attribute2"/>
+              </element>
+            </element>
+          </define>
+        </grammar>""",
+     # <documentation>
+     #   <element id='0' name="test">
+     #     <namespace/>
+     #     <description/>
+     #     <attribute>
+     #       <name>test_attribute</name>
+     #       <namespace/>
+     #       <description/>
+     #       <type/>
+     #       <use>required</use>
+     #     </attribute>
+     #   </element>
+     # </documentation>
+     [
+         ("local-name(/*)", "documentation"),
+         ("/documentation/element[@name = 'test1']/namespace/text()",
+          ["http://www.example.com"]),
+         ("/documentation/element[@name = 'test2']/namespace/text()",
+          ["http://www.example.com"]),
+         ("/documentation/element[@name = 'test1']/attribute/namespace/text()",
+          []),
+         ("/documentation/element[@name = 'test2']/attribute/namespace/text()",
+          []),
+    ]
+    ),
+])
+def test_transform_namespaces(xml, expected):
     result = transform(io.StringIO(xml))
     assert isinstance(result, etree._ElementTree)
     for xpath, expected_value in expected:

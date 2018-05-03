@@ -25,6 +25,7 @@ from .exceptions import NoMatchinRootException
 
 log = logging.getLogger(__name__)
 
+
 #  gh://openSUSE/xmldiffng:xmldiffng/contrib/parse-rng.py
 
 
@@ -51,10 +52,8 @@ def transform_child(element, output, tree):
      :return: The transformed attributes
      :rtype: etree.Element
     """
-    name = element.get("name")
-    if name is None:
-        name = ascendants(RNG_DEFINE, element, RNG_ELEMENT, None, tree)
-    etree.SubElement(output, "child", id=name)
+    uuid = element.get("id")
+    etree.SubElement(output, "child", id=uuid)
     return output
 
 
@@ -81,6 +80,26 @@ def transform_data_type(element, output, tree):
         return data_type
 
 
+def find_namespace(element):
+    namespace = element.get("ns")
+    if namespace:
+        return namespace
+    name = element.get("name")
+    if name and len(name.split(":")) > 1:
+        prefix = name.split(":")[0]
+        if prefix in element.nsmap:
+            return element.nsmap[prefix]
+        elif prefix == "xml":
+            return "http://www.w3.org/XML/1998/namespace"
+    if element.tag == RNG_ATTRIBUTE.text:
+        return None
+    if element.tag == RNG_ELEMENT.text:
+        namespace = element.xpath("ancestor::node()[@ns][1]")
+    if namespace:
+        return namespace[0].get("ns")
+    return None
+
+
 def transform_attribute(element, output, tree):
     """Transforms a "rlxng attribute" element
 
@@ -95,7 +114,9 @@ def transform_attribute(element, output, tree):
     """
     attribute = etree.SubElement(output, "attribute")
     etree.SubElement(attribute, "name").text = element.get("name")
-    etree.SubElement(attribute, "namespace")
+    namespace = etree.SubElement(attribute, "namespace")
+    if find_namespace(element):
+        namespace.text = find_namespace(element)
     description = etree.SubElement(attribute, "description")
     doc_string = find_doc_string(element)
     if doc_string:
@@ -254,10 +275,13 @@ def transform_element(element, tree):
      :rtype: etree.Element
     """
     name = element.get("name")
+    uuid = element.get("id")
     if name is None:
         name = ascendants(RNG_DEFINE, element, RNG_ELEMENT, None, tree)
-    transformed_element = etree.Element("element", name=name)
-    etree.SubElement(transformed_element, "namespace")
+    transformed_element = etree.Element("element", name=name, id=uuid)
+    namespace = etree.SubElement(transformed_element, "namespace")
+    if find_namespace(element):
+        namespace.text = find_namespace(element)
     description = etree.SubElement(transformed_element, "description")
     doc_string = find_doc_string(element)
     if doc_string:
@@ -286,6 +310,11 @@ def transform(rngfilename, elementdef=None):
 
     documentation = etree.Element("documentation")
     elements = rngtree.xpath("//rng:element", namespaces=NSMAP)
+    index = 0
+    for element in elements:
+        uuid = "{}".format(index)
+        element.attrib["id"] = uuid
+        index += 1
     for element in elements:
         documentation.append(transform_element(element, rngtree))
     return etree.ElementTree(documentation)
