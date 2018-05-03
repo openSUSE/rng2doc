@@ -152,7 +152,10 @@ def test_transform_element(xml, expected):
      #       <name>test</name>
      #       <namespace/>
      #       <description/>
-     #       <type>text</type>
+     #       <type name="text">
+     #         <description/>
+     #         <param/>
+     #       </type>
      #       <use>required</use>
      #     </attribute>
      #   </element>
@@ -187,14 +190,20 @@ def test_transform_element(xml, expected):
      #       <name>test</name>
      #       <namespace/>
      #       <description/>
-     #       <type>text</type>
+     #       <type name="text">
+     #         <description/>
+     #         <param/>
+     #       </type>
      #       <use>required</use>
      #     </attribute>
      #     <attribute>
      #       <name>test2</name>
      #       <namespace/>
      #       <description/>
-     #       <type>text</type>
+     #       <type name="text">
+     #         <description/>
+     #         <param/>
+     #       </type>
      #       <use>required</use>
      #     </attribute>
      #   </element>
@@ -205,7 +214,10 @@ def test_transform_element(xml, expected):
      #       <name>test3</name>
      #       <namespace/>
      #       <description/>
-     #       <type>text</type>
+     #       <type name="text">
+     #         <description/>
+     #         <param/>
+     #       </type>
      #       <use>required</use>
      #     </attribute>
      #   </element>
@@ -248,7 +260,10 @@ def test_transform_attribute(xml, expected):
      #       <name>test</name>
      #       <namespace/>
      #       <description/>
-     #       <type>text</type>
+     #       <type name="text">
+     #         <description/>
+     #         <param/>
+     #       </type>
      #       <use>optional</use>
      #     </attribute>
      #   </element>
@@ -275,7 +290,10 @@ def test_transform_attribute(xml, expected):
      #       <name>test</name>
      #       <namespace/>
      #       <description/>
-     #       <type>text</type>
+     #       <type name="text">
+     #         <description/>
+     #         <param/>
+     #       </type>
      #       <use>required</use>
      #     </attribute>
      #   </element>
@@ -298,7 +316,8 @@ def test_transform_optional(xml, expected):
 
 
 @pytest.mark.parametrize('xml,expected', [
-    ("""<element name="root" xmlns="http://relaxng.org/ns/structure/1.0" xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0">
+    ("""<element name="root" xmlns="http://relaxng.org/ns/structure/1.0"
+         xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0">
           <a:documentation>This is a test element.</a:documentation>
           <optional>
             <attribute name="test">
@@ -317,7 +336,10 @@ def test_transform_optional(xml, expected):
      #       <name>test</name>
      #       <namespace/>
      #       <description>This is a test attribute.</description>
-     #       <type>text</type>
+     #       <type name="text">
+     #         <description/>
+     #         <param/>
+     #       </type>
      #       <use>optional</use>
      #     </attribute>
      #   </element>
@@ -354,15 +376,84 @@ def test_transform_annotations(xml, expected):
      #       <name>test_attribute</name>
      #       <namespace/>
      #       <description/>
-     #       <type>string</type>
+     #       <type name="string">
+     #         <description/>
+     #         <param/>
+     #       </type>
      #       <use>required</use>
      #     </attribute>
      #   </element>
      # </documentation>
      [
          ("local-name(/*)", "documentation"),
-         ("/documentation/element[@name = 'root']/attribute/type/text()",
-          ["string"]),
+         ("boolean(/documentation/element[@name = 'root']/attribute/type[@name = 'string'])", True),
+         ("boolean(/documentation/element[@name = 'root']/attribute/type[@name = 'string']/param)", True),
+         ("boolean(/documentation/element[@name = 'root']/attribute/type[@name = 'string']/description)", True),
+     ]
+    ),
+    ("""<element name="root" xmlns="http://relaxng.org/ns/structure/1.0">
+            <attribute name="test">
+              <data type="token">
+                <param name="pattern">[a-zA-Z0-9_\-\.]+</param>
+              </data>
+            </attribute>
+        </element>""",
+     # The expected result looks like:
+     # -------------------------------
+     # <documentation>
+     #   <element name="root">
+     #     <namespace/>
+     #     <description/>
+     #     <attribute>
+     #       <name>test_attribute</name>
+     #       <namespace/>
+     #       <description/>
+     #       <type name="token">
+     #         <description/>
+     #         <param name="pattern">[a-zA-Z0-9_\-\.]+</param>
+     #       </type>
+     #       <use>required</use>
+     #     </attribute>
+     #   </element>
+     # </documentation>
+     [
+         ("local-name(/*)", "documentation"),
+         ("boolean(/documentation/element[@name = 'root']/attribute/type[@name = 'token'])", True),
+         ("boolean(/documentation/element[@name = 'root']/attribute/type[@name = 'token']/param[@name = 'pattern'])", True),
+         ("/documentation/element[@name = 'root']/attribute/type[@name = 'token']/param[@name = 'pattern']/text()",
+          ["[a-zA-Z0-9_\-\.]+"]),
+     ]
+    ),
+    ("""<element name="root" xmlns="http://relaxng.org/ns/structure/1.0"
+         xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0">
+            <attribute name="test">
+              <data type="string">
+                <a:documentation>This is a test datatype</a:documentation>
+              </data>
+            </attribute>
+        </element>""",
+     # The expected result looks like:
+     # -------------------------------
+     # <documentation>
+     #   <element name="root">
+     #     <namespace/>
+     #     <description/>
+     #     <attribute>
+     #       <name>test_attribute</name>
+     #       <namespace/>
+     #       <description/>
+     #       <type name="string">
+     #         <description>This is a test datatype</description>
+     #         <param/>
+     #       </type>
+     #       <use>required</use>
+     #     </attribute>
+     #   </element>
+     # </documentation>
+     [
+         ("local-name(/*)", "documentation"),
+         ("/documentation/element[@name = 'root']/attribute/type/description/text()",
+          ["This is a test datatype"]),
      ]
     ),
 ])
@@ -411,14 +502,20 @@ def test_transform_datatype(xml, expected):
      #       <name>test_attribute1</name>
      #       <namespace/>
      #       <description/>
-     #       <type>text</type>
+     #       <type name="text">
+     #         <description/>
+     #         <param/>
+     #       </type>
      #       <use>required</use>
      #     </attribute>
      #     <attribute>
      #       <name>test_attribute2</name>
      #       <namespace/>
      #       <description/>
-     #       <type>text</type>
+     #       <type name="text">
+     #         <description/>
+     #         <param/>
+     #       </type>
      #       <use>required</use>
      #     </attribute>
      #   </element>
@@ -479,9 +576,14 @@ def test_transform_references(xml, expected):
      #       <namespace/>
      #       <description/>
      #       <type name="enum">
+     #         <description/>
      #         <param/>
-     #         <value name="value1"/>
+     #         <value name="value1">
+     #           <description/>
+     #         </value>
      #         <value name="value2"/>
+     #           <description/>
+     #         </value
      #       </type>
      #       <use>required</use>
      #     </attribute>
@@ -489,13 +591,72 @@ def test_transform_references(xml, expected):
      # </documentation>"""
      [
          ("local-name(/*)", "documentation"),
-         ("count(/documentation/element)", 2),
-         ("count(/documentation/element[@name = 'test2']/attribute)", 1),
          ("boolean(/documentation/element[@name = 'test2']/attribute[1]/type[@name = 'enum'])", True),
          ("boolean(/documentation/element[@name = 'test2']/attribute[1]/type/value[@name = 'value1'])", True),
          ("boolean(/documentation/element[@name = 'test2']/attribute[1]/type/value[@name = 'value2'])", True),
      ]
+    ),
+    ("""<grammar xmlns="http://relaxng.org/ns/structure/1.0"
+         xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0">
+          <start>
+            <element name="test1">
+              <zeroOrMore>
+                <element name="test2">
+                  <ref name="test2.attlist"/>
+                </element>
+              </zeroOrMore>
+            </element>
+          </start>
 
+          <define name="test2.attlist">
+            <attribute name="test_attribute1">
+              <choice>
+                <value>value1</value>
+                <a:documentation>A test value1</a:documentation>
+                <value>value2</value>
+                <a:documentation>A test value2</a:documentation>
+              </choice>
+            </attribute>
+          </define>
+        </grammar>""",
+     # The expected result looks like:
+     # -------------------------------
+     # <documentation>
+     #   <element name="test1">
+     #     <namespace/>
+     #     <description></description>
+     #     <child id="test2"/>
+     #   </element>
+     #   <element name="test2">
+     #     <namespace/>
+     #     <description></description>
+     #     <attribute>
+     #       <name>test_attribute1</name>
+     #       <namespace/>
+     #       <description/>
+     #       <type name="enum">
+     #         <description/>
+     #         <param/>
+     #         <value name="value1">
+     #            <description>A test value1</description>
+     #         </value>
+     #         <value name="value2">
+     #            <description>A test value2</description>
+     #         </value>
+     #       </type>
+     #       <use>required</use>
+     #     </attribute>
+     #   </element>
+     # </documentation>"""
+     [
+         ("local-name(/*)", "documentation"),
+         ("boolean(/documentation/element[@name = 'test2']/attribute[1]/type[@name = 'enum'])", True),
+         ("boolean(/documentation/element[@name = 'test2']/attribute[1]/type/value[@name = 'value1'])", True),
+         ("/documentation/element[@name = 'test2']/attribute[1]/type/value[@name = 'value1']/description/text()",
+           ["A test value1"]),
+         ("/documentation/element[@name = 'test2']/attribute[1]/type/value[@name = 'value2']/description/text()",
+           ["A test value2"]),
+     ]
     ),
 ])
 def test_transform_enumerations(xml, expected):
@@ -536,6 +697,7 @@ def test_transform_enumerations(xml, expected):
      #       <namespace/>
      #       <description/>
      #       <type>
+     #         <description/>
      #         <param/>
      #       </type>
      #       <use>required</use>

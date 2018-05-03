@@ -69,15 +69,34 @@ def transform_data_type(element, output, tree):
      :return: The transformed attributes
      :rtype: etree.Element
     """
+    attribute_type = etree.SubElement(output, "type")
+    description_type = etree.SubElement(attribute_type, "description")
+    param = etree.SubElement(attribute_type, "param")
     data_type = descendants(RNG_DATA, element, None, tree)
     if data_type:
-        return data_type
+        attribute_type.attrib["name"] = data_type
+        description = find_doc_string(element.find(RNG_DATA.text))
+        if description:
+            description_type.text = description
+        _param = descendants(RNG_PARAM, element, None, tree)
+        if _param:
+            param.attrib["name"], param.text = _param
+        return output
     data_type = descendants(RNG_TEXT, element, None, tree)
     if data_type:
-        return data_type
-    data_type = descendants(RNG_CHOICE, element, None, tree)
-    if data_type:
-        return data_type
+        attribute_type.attrib["name"] = data_type
+        return output
+    values = descendants(RNG_CHOICE, element, None, tree)
+    if values:
+        attribute_type.attrib["name"] = "enum"
+        for value, _description in values:
+            value_tag = etree.SubElement(attribute_type, "value")
+            description_value = etree.SubElement(value_tag, "description")
+            value_tag.attrib["name"] = value
+            if _description:
+                description_value.text = _description
+        return output
+    return output
 
 
 def find_namespace(element):
@@ -121,8 +140,8 @@ def transform_attribute(element, output, tree):
     doc_string = find_doc_string(element)
     if doc_string:
         description.text = doc_string
-    attribute_type = etree.SubElement(attribute, "type")
-    attribute_type.text = transform_data_type(element, output, tree)
+    attribute = transform_data_type(element, attribute, tree)
+
     optional = ascendants(RNG_OPTIONAL, element, RNG_ATTRIBUTE, None, tree)
     if optional:
         etree.SubElement(attribute, "use").text = "optional"
@@ -201,14 +220,18 @@ def descendants(qname, element, output, tree):
             if qname.text == RNG_CHOICE.text:
                 values = []
                 values = descendants(RNG_VALUE, child, values, tree)
-                if values:
-                    return "enum [{}]".format("|".join(values))
-                else:
-                    return "enum"
+                return values
             if qname.text == RNG_PARAM.text:
-                return child.get("pattern")
+                return (child.get("name"), child.text)
             if qname.text == RNG_VALUE.text:
-                output.append(child.text)
+                description = ""
+                for sibling in child.itersiblings():
+                    if sibling.tag == A_DOC.text:
+                        description = sibling.text
+                        break
+                output.append(
+                    (child.text, description)
+                )
 
         if child.tag == RNG_REF.text:
             anchor_name = child.get("name")
@@ -227,11 +250,12 @@ def find_doc_string(element):
      :return: The documentation string of the given element or an empty string.
      :rtype: str
     """
-    doc_string = element.find("{}".format(A_DOC))
+    doc_string = None
+    if element is not None:
+        doc_string = element.find("{}".format(A_DOC))
     if doc_string is not None:
         return strip_newlines(doc_string.text)
-    else:
-        return ""
+    return ""
 
 
 def find_children(element, output, tree):
