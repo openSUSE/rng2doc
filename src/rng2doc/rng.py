@@ -57,7 +57,7 @@ def transform_child(element, output, tree):
     return output
 
 
-def transform_data_type(element, output, tree):
+def transform_data(element, output, tree):
     """Transforms a "rlxng data" element
 
      :param element: A rlxng element
@@ -69,32 +69,90 @@ def transform_data_type(element, output, tree):
      :return: The transformed attributes
      :rtype: etree.Element
     """
+    description_type = etree.SubElement(output, "description")
+    param = etree.SubElement(output, "param")
+    description = find_doc_string(element.find(RNG_DATA.text))
+    if description:
+        description_type.text = description
+    param_tuple = descendants(RNG_PARAM, element, None, tree)
+    if param_tuple:
+        param.attrib["name"], param.text = param_tuple
+    return output
+
+
+def transform_text(element, output, tree):
+    """Transforms a "rlxng text" element
+
+     :param element: A rlxng element
+     :type element: etree.Element
+     :param element: The transformed output so far
+     :type element: etree.Element
+     :param tree: The whole tree of the original file
+     :type tree: etree.ElementTree
+     :return: The transformed attributes
+     :rtype: etree.Element
+    """
+    etree.SubElement(output, "description")
+    param = etree.SubElement(output, "param")
+    param_tuple = descendants(RNG_PARAM, element, None, tree)
+    if param_tuple:
+        param.attrib["name"], param.text = param_tuple
+    return output
+
+
+def transform_enum(values, output, tree):
+    """Transforms a "rlxng enum"
+
+     :param element: A rlxng element
+     :type element: etree.Element
+     :param element: The transformed output so far
+     :type element: etree.Element
+     :param tree: The whole tree of the original file
+     :type tree: etree.ElementTree
+     :return: The transformed attributes
+     :rtype: etree.Element
+    """
+    etree.SubElement(output, "description")
+    etree.SubElement(output, "param")
+    for value, description_text in values:
+        value_tag = etree.SubElement(output, "value")
+        description = etree.SubElement(value_tag, "description")
+        value_tag.attrib["name"] = value
+        if description_text:
+            description.text = description_text
+    return output
+
+
+def transform_data_type(element, output, tree):
+    """Transforms the datatype of the attribute
+
+     :param element: A rlxng element
+     :type element: etree.Element
+     :param element: The transformed output so far
+     :type element: etree.Element
+     :param tree: The whole tree of the original file
+     :type tree: etree.ElementTree
+     :return: The transformed attributes
+     :rtype: etree.Element
+    """
     attribute_type = etree.SubElement(output, "type")
-    description_type = etree.SubElement(attribute_type, "description")
-    param = etree.SubElement(attribute_type, "param")
+
     data_type = descendants(RNG_DATA, element, None, tree)
     if data_type:
         attribute_type.attrib["name"] = data_type
-        description = find_doc_string(element.find(RNG_DATA.text))
-        if description:
-            description_type.text = description
-        _param = descendants(RNG_PARAM, element, None, tree)
-        if _param:
-            param.attrib["name"], param.text = _param
+        attribute_type = transform_data(element, attribute_type, tree)
         return output
+
     data_type = descendants(RNG_TEXT, element, None, tree)
     if data_type:
         attribute_type.attrib["name"] = data_type
+        attribute_type = transform_text(element, attribute_type, tree)
         return output
+
     values = descendants(RNG_CHOICE, element, None, tree)
     if values:
         attribute_type.attrib["name"] = "enum"
-        for value, _description in values:
-            value_tag = etree.SubElement(attribute_type, "value")
-            description_value = etree.SubElement(value_tag, "description")
-            value_tag.attrib["name"] = value
-            if _description:
-                description_value.text = _description
+        attribute_type = transform_enum(values, attribute_type, tree)
         return output
     return output
 
@@ -131,12 +189,14 @@ def transform_attribute(element, output, tree):
      :return: The transformed attributes
      :rtype: etree.Element
     """
+
     attribute = etree.SubElement(output, "attribute")
     etree.SubElement(attribute, "name").text = element.get("name")
     namespace = etree.SubElement(attribute, "namespace")
     if find_namespace(element):
         namespace.text = find_namespace(element)
     description = etree.SubElement(attribute, "description")
+
     doc_string = find_doc_string(element)
     if doc_string:
         description.text = doc_string
