@@ -478,7 +478,11 @@ def test_transform_references(xml, expected):
      #       <name>test_attribute1</name>
      #       <namespace/>
      #       <description/>
-     #       <type>enum [value1|value2]</type>
+     #       <type name="enum">
+     #         <param/>
+     #         <value name="value1"/>
+     #         <value name="value2"/>
+     #       </type>
      #       <use>required</use>
      #     </attribute>
      #   </element>
@@ -487,8 +491,9 @@ def test_transform_references(xml, expected):
          ("local-name(/*)", "documentation"),
          ("count(/documentation/element)", 2),
          ("count(/documentation/element[@name = 'test2']/attribute)", 1),
-         ("/documentation/element[@name = 'test2']/attribute[1]/type/text()",
-          ["enum [value1|value2]"]),
+         ("boolean(/documentation/element[@name = 'test2']/attribute[1]/type[@name = 'enum'])", True),
+         ("boolean(/documentation/element[@name = 'test2']/attribute[1]/type/value[@name = 'value1'])", True),
+         ("boolean(/documentation/element[@name = 'test2']/attribute[1]/type/value[@name = 'value2'])", True),
      ]
 
     ),
@@ -530,7 +535,9 @@ def test_transform_enumerations(xml, expected):
      #       <name/>
      #       <namespace/>
      #       <description/>
-     #       <type/>
+     #       <type>
+     #         <param/>
+     #       </type>
      #       <use>required</use>
      #     </attribute>
      #   </element>
