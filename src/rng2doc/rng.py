@@ -81,9 +81,6 @@ def transform_data_type(element, output, tree):
 
 
 def find_namespace(element):
-    namespace = element.get("ns")
-    if namespace:
-        return namespace
     name = element.get("name")
     if name and len(name.split(":")) > 1:
         prefix = name.split(":")[0]
@@ -91,6 +88,9 @@ def find_namespace(element):
             return element.nsmap[prefix]
         elif prefix == "xml":
             return "http://www.w3.org/XML/1998/namespace"
+    namespace = element.get("ns")
+    if namespace:
+        return namespace
     if element.tag == RNG_ATTRIBUTE.text:
         return None
     if element.tag == RNG_ELEMENT.text:

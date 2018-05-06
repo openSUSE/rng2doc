@@ -753,6 +753,40 @@ def test_transform_name_classes(xml, expected):
           []),
     ]
     ),
+    ("""<grammar xmlns="http://relaxng.org/ns/structure/1.0"
+                 xmlns:trans="http://docbook.org/ns/transclusion">
+          <start>
+            <ref name="test.define"/>
+          </start>
+
+          <define name="test.define">
+            <element name="trans:test" ns="http://www.example.com">
+              <attribute name="test_attribute"/>
+            </element>
+          </define>
+        </grammar>""",
+     # <documentation>
+     #   <element name="test">
+     #     <namespace>http://docbook.org/ns/transclusion</namespace>
+     #     <description/>
+     #     <attribute>
+     #       <name>test_attribute</name>
+     #       <namespace/>
+     #       <description/>
+     #       <type/>
+     #       <use>required</use>
+     #     </attribute>
+     #   </element>
+     # </documentation>
+     [
+         ("local-name(/*)", "documentation"),
+         ("/documentation/element[@name = 'trans:test']/namespace/text()",
+          ["http://docbook.org/ns/transclusion"]),
+         ("/documentation/element[@name = 'trans:test']/attribute/namespace/text()",
+          []),
+     ]
+    ),
+
 ])
 def test_transform_namespaces(xml, expected):
     result = transform(io.StringIO(xml))
