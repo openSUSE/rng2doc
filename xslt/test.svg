@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="230" height="570" preserveAspectRatio="xMidYMid meet" zoomAndPan="magnify" version="1.1" contentScriptType="text/ecmascript" contentStyleType="text/css">
+  <rect style="fill:green" id="0" class="parent" width="50" height="30" x="40" y="270" rx="5" ry="5"/>
+  <text x="65" y="287.5" font-family="Consolas,monaco,monospace;" font-size="12" style="fill#white" text-anchor="middle" id="text_0">image</text>
+  <rect style="fill:green" id="78" class="child" width="40" height="30" x="170" y="30" rx="5" ry="5"/>
+  <text x="190" y="47.5" font-family="Consolas,monaco,monospace;" font-size="12" style="fill#white" text-anchor="middle" id="text_78">foo1</text>
+  <line xmlns:s="http://www.w3.org/2000/svg" x1="90" y1="285" x2="170" y2="45" stroke="black" stroke-width="1"/>
+  <rect style="fill:green" id="100" class="child" width="40" height="30" x="170" y="90" rx="5" ry="5"/>
+  <text x="190" y="107.5" font-family="Consolas,monaco,monospace;" font-size="12" style="fill#white" text-anchor="middle" id="text_100">foo2</text>
+  <line xmlns:s="http://www.w3.org/2000/svg" x1="90" y1="285" x2="170" y2="105" stroke="black" stroke-width="1"/>
+  <rect style="fill:green" id="101" class="child" width="40" height="30" x="170" y="150" rx="5" ry="5"/>
+  <text x="190" y="167.5" font-family="Consolas,monaco,monospace;" font-size="12" style="fill#white" text-anchor="middle" id="text_101">foo3</text>
+  <line xmlns:s="http://www.w3.org/2000/svg" x1="90" y1="285" x2="170" y2="165" stroke="black" stroke-width="1"/>
+  <rect style="fill:green" id="81" class="child" width="40" height="30" x="170" y="210" rx="5" ry="5"/>
+  <text x="190" y="227.5" font-family="Consolas,monaco,monospace;" font-size="12" style="fill#white" text-anchor="middle" id="text_81">foo4</text>
+  <line xmlns:s="http://www.w3.org/2000/svg" x1="90" y1="285" x2="170" y2="225" stroke="black" stroke-width="1"/>
+  <rect style="fill:green" id="103" class="child" width="40" height="30" x="170" y="270" rx="5" ry="5"/>
+  <text x="190" y="287.5" font-family="Consolas,monaco,monospace;" font-size="12" style="fill#white" text-anchor="middle" id="text_103">foo5</text>
+  <line xmlns:s="http://www.w3.org/2000/svg" x1="90" y1="285" x2="170" y2="285" stroke="black" stroke-width="1"/>
+  <rect style="fill:green" id="79" class="child" width="40" height="30" x="170" y="330" rx="5" ry="5"/>
+  <text x="190" y="347.5" font-family="Consolas,monaco,monospace;" font-size="12" style="fill#white" text-anchor="middle" id="text_79">foo6</text>
+  <line xmlns:s="http://www.w3.org/2000/svg" x1="90" y1="285" x2="170" y2="345" stroke="black" stroke-width="1"/>
+  <rect style="fill:green" id="80" class="child" width="40" height="30" x="170" y="390" rx="5" ry="5"/>
+  <text x="190" y="407.5" font-family="Consolas,monaco,monospace;" font-size="12" style="fill#white" text-anchor="middle" id="text_80">foo7</text>
+  <line xmlns:s="http://www.w3.org/2000/svg" x1="90" y1="285" x2="170" y2="405" stroke="black" stroke-width="1"/>
+  <rect style="fill:green" id="56" class="child" width="40" height="30" x="170" y="450" rx="5" ry="5"/>
+  <text x="190" y="467.5" font-family="Consolas,monaco,monospace;" font-size="12" style="fill#white" text-anchor="middle" id="text_56">foo8</text>
+  <line xmlns:s="http://www.w3.org/2000/svg" x1="90" y1="285" x2="170" y2="465" stroke="black" stroke-width="1"/>
+  <rect style="fill:green" id="99" class="child" width="40" height="30" x="170" y="510" rx="5" ry="5"/>
+  <text x="190" y="527.5" font-family="Consolas,monaco,monospace;" font-size="12" style="fill#white" text-anchor="middle" id="text_99">foo9</text>
+  <line xmlns:s="http://www.w3.org/2000/svg" x1="90" y1="285" x2="170" y2="525" stroke="black" stroke-width="1"/>
+</svg>
