@@ -13,6 +13,8 @@ Options:
     --version         Prints the version
     --output=<OUTFILE>, -o <OUTFILE>
                       Optional file where results are written to
+    --output-format=<FORMAT>, -f <FORMAT>
+                      Specifies the format of the output. (xml, html) [default: xml]
 """
 
 # Standard Library
@@ -64,9 +66,25 @@ def checkargs(args):
         raise DocoptExit()
     if not os.path.exists(rng):
         raise FileNotFoundError(rng)
+    oformat = args['--output-format'].lower()
+    if oformat not in ('html', 'xml'):
+        raise RuntimeError("Wrong format.")
 
 
-def output(result, file_path):
+def output(result, file_path, oformat):
+    """Write the result to a file if the --output argument is set otherwise
+       the result will be printed on stdout.
+
+    :param result: The results of the transform method
+    :type result: ElementTree
+    :param file_path: The file path to the output file
+    :type file_path: str
+    :return: None
+    """
+    if oformat == "html":
+        xslt_html = etree.parse("xslt/html.xslt")
+        transform = etree.XSLT(xslt_html)
+        result = transform(result)
     if file_path:
         result.write(
             file_path, pretty_print=True, xml_declaration=True, encoding="utf-8")
@@ -88,7 +106,7 @@ def main(cliargs=None):
         log.debug("CLI result: %s", args)
         checkargs(args)
         result = process(args)
-        result = output(result, args['--output'])
+        output(result, args['--output'], args["--output-format"])
         log.info("Done.")
         return 0
 
