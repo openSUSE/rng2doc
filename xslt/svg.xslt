@@ -22,7 +22,7 @@
     <xsl:param name="element"/>
     <xsl:variable name="margin" select="40"/>
     <xsl:variable name="spacer_vertical" select="30"/>
-    <xsl:variable name="spacer_horicontal" select="60"/>
+    <xsl:variable name="spacer_horicontal" select="100"/>
     <xsl:variable name="font_size" select="12"/>
     <xsl:variable name="width_element" select="($font_size - 2) * string-length($element/@name)"/>
     <xsl:variable name="height_element" select="30"/>
@@ -38,10 +38,10 @@
       </xsl:for-each>
     </xsl:variable>
 
-    <xsl:variable name="width_svg" select="$margin + $width_element + $spacer_horicontal + ($max_string_length_children * ($font_size -2)) + $margin"/>
+    <xsl:variable name="width_svg" select="$margin + $width_element + $spacer_horicontal + ($max_string_length_children * ($font_size -2)) + $margin + 100"/>
     <xsl:variable name="height_svg" select="($number_of_children * ($height_element + $spacer_vertical)) + $spacer_vertical"/> 
     <svg xmlns="http://www.w3.org/2000/svg" 
-      width="{$width_svg}" height="{$height_svg}">
+      width="{$width_svg}" height="{$height_svg}" viewbox="0 0 {$width_svg} {$height_svg}">
 
       <xsl:choose>
         <xsl:when test="$number_of_children mod 2 = 0">
