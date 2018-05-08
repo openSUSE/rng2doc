@@ -51,7 +51,8 @@
   </xsl:template>  
 
   <xsl:template match="element" mode="visualize">
-    <div class="card" id="element{@id}" name="element{@id}">
+    <xsl:variable name="id" select="@id"/> 
+    <div class="card" id="element{$id}" name="element{$id}">
       <div class="card-header">
         Element
       </div>
@@ -74,6 +75,21 @@
             <xsl:with-param name="element" select="."/>
           </xsl:call-template>
         </div>
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item">
+            <span class="lead">Vaterelemente:</span>
+            <xsl:variable name="parents" select="//element/child[@id = $id]/parent::element"/>
+            <xsl:choose>
+              <xsl:when test="$parents">  
+                <xsl:text disable-output-escaping="yes"><![CDATA[&nbsp;]]></xsl:text>
+                <xsl:apply-templates select="$parents" mode="parent"/>
+              </xsl:when>
+              <xsl:otherwise>
+                -
+              </xsl:otherwise>
+            </xsl:choose>
+          </li>
+        </ul>
         <ul class="list-group list-group-flush">
           <li class="list-group-item">
             <span class="lead">Kindelemente:</span>
@@ -106,9 +122,19 @@
     <div class="toTop"><a href="#index"> [ top ] </a></div>
   </xsl:template>
 
+  <xsl:template match="element" mode="parent">
+    <a href ="#element{@id}"><xsl:value-of select="@name"/></a>
+    <xsl:if test="position() != last()">
+         <xsl:text>, </xsl:text>
+    </xsl:if>
+  </xsl:template>
+
   <xsl:template match="child">
     <xsl:variable name="id" select="@id"/> 
-    <a href="#element{@id}"><xsl:value-of select="//element[@id = $id]/@name"/></a>, 
+    <a href="#element{@id}"><xsl:value-of select="//element[@id = $id]/@name"/></a>
+    <xsl:if test="position() != last()">
+         <xsl:text>, </xsl:text>
+    </xsl:if> 
   </xsl:template>
 
   <xsl:template match="attribute">
