@@ -14,6 +14,10 @@ include README*
 include LICENSE
 include *.rst
 
+# XSLT Stylesheets
+include xslt/html.xslt
+include xslt/svg.xslt
+
 # Development Files & Test Suite
 include make_devsetup.sh
 include *requirements.txt
@@ -37,7 +41,6 @@ include .idea/vcs.xml
 
 # Exclude some specific files
 exclude bitbucket-pipelines.yml
-exclude xslt/*
 
 # REMOVE NONSENSE
 prune ci
