@@ -1,0 +1,205 @@
+#
+# Internal data structure for rng2doc
+# Based on the work by Jürgen Löhel
+#
+# RNG Schema from Thomas Schraitle
+# Written May 2018
+#
+
+default namespace = ""
+namespace a = "http://relaxng.org/ns/compatibility/annotations/1.0"
+
+
+# DESIGN HINTS
+#
+# The following naming conventions apply to this RNG:
+# * d.<NAME>
+#   The pattern name of the element <NAME>
+# * d.<NAME>.attlist
+#   the collection of all attributes for element <NAME>
+# * d.<NAME>.<ATTR>.attrib
+#   the single attribute <ATTR> of element <NAME>
+# Every element and its attributes are wrapped in a div
+
+
+# Global pattern
+d.name.attrib =
+   ## the name of the object
+   attribute name { text }
+
+
+# Element: namespace
+div 
+{
+   d.namespace.prefix.attrib =
+      ## the prefix of a namespace;
+      ## if it's empty or not there, it is considered the default namespace
+      ## (which has no prefix)
+      attribute prefix { text }
+   d.namespace.attlist =
+      d.namespace.prefix.attrib?
+   d.namespace =
+      ## A namespace URI
+      element namespace {
+         d.namespace.attlist,
+         xsd:anyURI
+      }
+}
+
+
+# Element: description
+div
+{
+   d.description.attlist =
+      empty
+   d.description =
+      ## the description of an element or attribute
+      element description {
+         d.description.attlist,
+         text
+      }
+}
+
+
+# Element: param
+div
+{
+   d.param.name.attrib =
+      d.name.attrib
+   d.param.attlist =
+      d.param.name.attrib?
+   d.param =
+      ## Parameter of an attribute
+      element param {
+         d.param.attlist,
+         text
+      }
+}
+
+
+# Element: value
+div
+{
+   d.value.name.attrib =
+      d.name.attrib
+   d.value.attlist =
+      d.value.name.attrib
+   d.value =
+      ## a value inside an attribute
+      element value {
+         d.value.attlist,
+         d.description
+      }
+}
+
+
+# Element: type
+div{
+   db.type.name.enum =
+      ## From <data type="token">
+      "token" |
+      ## From <data type="string"/>
+      "string" |
+      ## Normal attribute with <text/>
+      "text" |
+      ## Enumeration of attribute values
+      "enum"
+   d.type.name.attrib =
+      ## the type of an attribute
+      attribute name { db.type.name.enum }
+   d.type.attlist =
+      d.type.name.attrib
+   d.type =
+      ## The contents of an attribute
+      element type {
+         d.type.attlist?,
+         (d.description,
+          d.param,
+          d.value?
+         )?
+      }
+}
+
+
+# Element: child
+div
+{
+   d.child.ref.attrib =
+      ## Reference to another element
+      attribute ref { xsd:IDREF }
+   d.child.attlist =
+      d.child.ref.attrib
+   d.child =
+      ## A reference to a child element
+      element child {
+         d.child.attlist,
+         empty
+      }
+}
+
+
+# Element: attribute
+div {
+   d.attribute.id.attrib =
+      ## Identifier of the attribute
+      attribute ref { xsd:ID }
+   d.attribute.name.attrib =
+      d.name.attrib
+   d.attribute.required.attrib =
+      ## Is the attribute required?
+      attribute required { "yes" | "no" }
+   d.attribute.attlist =
+      d.attribute.id.attrib? &
+      d.attribute.name.attrib &
+      d.attribute.required.attrib?
+   d.attribute =
+      ## An attribute
+      element attribute {
+         d.attribute.attlist,
+         d.namespace?,
+         d.description?,
+         d.type
+      }
+}
+
+
+# Element: element
+div {
+   d.element.id.attrib =
+      ## Identifier of the element
+      attribute id { xsd:ID }
+   d.element.name.attrib =
+      d.name.attrib
+   d.element.attlist =
+      d.element.name.attrib &
+      d.element.id.attrib?
+   d.element =
+      ## An element
+      element \element {
+         d.element.attlist,
+         d.namespace?,
+         d.description?,
+         d.child*,
+         d.attribute*
+      }
+}
+
+
+# Element: documentation
+div
+{
+   d.documentation.version.attrib =
+      ## The version of the documentation format
+      attribute version { "0.9" }
+   d.documentation.attlist =
+      d.documentation.version.attrib?
+   d.documentation =
+      ## Root element of a RNG documentation
+      element documentation {
+         d.documentation.attlist,
+         d.element+
+      }
+}
+
+
+start = d.documentation
