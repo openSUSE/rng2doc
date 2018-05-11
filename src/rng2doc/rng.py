@@ -6,27 +6,80 @@
 import logging
 
 # Third Party Libraries
+import graphviz as gv
 from lxml import etree
 
 # Local imports
 from .common import (A_DOC,
                      NSMAP,
+                     # RNG_GRAMMAR,
+                     # RNG_START,
+                     # RNG_INCLUDE,
+                     RNG_DEFINE,
+                     RNG_REF,
+                     # RNG_EXTERNAL_REF,
+                     RNG_ELEMENT,
                      RNG_ATTRIBUTE,
+                     RNG_ZERO_OR_MORE,
+                     RNG_ONE_OR_MORE,
+                     RNG_LIST,
+                     RNG_GROUP,
+                     RNG_OPTIONAL,
+                     RNG_INTERLEAVE,
                      RNG_CHOICE,
                      RNG_DATA,
-                     RNG_DEFINE,
-                     RNG_ELEMENT,
-                     RNG_OPTIONAL,
-                     RNG_PARAM,
-                     RNG_REF,
                      RNG_TEXT,
-                     RNG_VALUE)
+                     RNG_PARAM,
+                     RNG_VALUE,
+                     RNG_ANY_NAME,
+                     RNG_NS_NAME,
+                     RNG_EXCEPT,
+                     RNG_DIV,
+                     RNG_EMPTY)
 from .exceptions import NoMatchinRootException
 
 log = logging.getLogger(__name__)
 
 
 #  gh://openSUSE/xmldiffng:xmldiffng/contrib/parse-rng.py
+
+class RngIterator:
+    def __init__(self, qname, node, defines):
+        self.node = None
+        self.next_node = node
+        self.defines = defines
+        self.qname = qname
+        self.children = node.getchildren()
+        self.children.reverse()
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        try:
+            self.node = self.next_node
+            self.next_node = self.children.pop()
+            if self.next_node.tag == RNG_ELEMENT.text:
+                self.node = self.next_node
+                if self.children:
+                    self.next_node = self.children.pop()
+                else:
+                    return self.node
+            if self.qname.text == self.next_node.tag:
+                if self.children:
+                    self.next_node = self.children.pop()
+                else:
+                    return self.node
+
+            if self.next_node.tag == RNG_REF.text:
+                self.children += self.defines[self.next_node.get("name")]
+
+            next_children = self.next_node.getchildren()
+            next_children.reverse()
+            self.children += next_children
+            return self.node
+        except IndexError:
+            raise StopIteration
 
 
 def strip_newlines(string):
@@ -348,6 +401,177 @@ def find_attributes(element, output, tree):
     return descendants(RNG_ATTRIBUTE, element, output, tree)
 
 
+def t_node(index, node):
+    identifier = "node{}".format(index)
+    name = node.tag
+    styles = {}
+
+    if node.tag == RNG_ELEMENT.text:
+        identifier = "{}{}".format(
+            node.get("name"),
+            node.get("id"))
+        name = node.get("name")
+        if name is None:
+            name = "name class"
+        styles["shape"] = "box"
+        styles["style"] = "rounded,filled"
+        styles["fillcolor"] = "#c0ffee"
+
+    if node.tag == RNG_ATTRIBUTE.text:
+        name = node.get("name")
+        if name is None:
+            name = "name class"
+        styles["shape"] = "ellipse"
+        styles["style"] = "filled"
+        styles["fillcolor"] = "#fca9a9"
+
+    if node.tag == RNG_DEFINE.text:
+        name = node.get("name")
+
+    if node.tag == RNG_DATA.text:
+        name = node.get("type")
+        styles["shape"] = "ellipse"
+        styles["style"] = "filled"
+        styles["fillcolor"] = "#a9bdfc"
+
+    if node.tag == RNG_VALUE.text:
+        name = node.text
+        styles["shape"] = "ellipse"
+        styles["style"] = "filled"
+        styles["fillcolor"] = "#a2a4aa"
+
+    if node.tag == RNG_PARAM.text:
+        param_name = node.get("name")
+        param_value = node.text
+        name = "{} = {}".format(param_name, param_value)
+        styles["shape"] = "ellipse"
+        styles["style"] = "filled"
+        styles["fillcolor"] = "#f9d368"
+
+    if node.tag == RNG_NS_NAME.text:
+        namespace = node.get("ns")
+        name = namespace
+        styles["shape"] = "ellipse"
+
+    if node.tag == RNG_INTERLEAVE.text:
+        name = "&"
+        styles["shape"] = "circle"
+
+    if node.tag == RNG_ZERO_OR_MORE.text:
+        name = "*"
+        styles["shape"] = "circle"
+
+    if node.tag == RNG_ONE_OR_MORE.text:
+        name = "+"
+        styles["shape"] = "circle"
+
+    if node.tag == RNG_OPTIONAL.text:
+        name = "?"
+        styles["shape"] = "circle"
+
+    if node.tag == RNG_CHOICE.text:
+        name = "|"
+        styles["shape"] = "circle"
+
+    if node.tag == RNG_EXCEPT.text:
+        name = "-"
+        styles["shape"] = "circle"
+
+    if node.tag == RNG_GROUP.text:
+        name = "group"
+        styles["shape"] = "circle"
+
+    if node.tag == RNG_LIST.text:
+        name = "list"
+        styles["shape"] = "circle"
+
+    if node.tag == RNG_TEXT.text:
+        name = "Text"
+        styles["shape"] = "rect"
+
+    if node.tag == RNG_EMPTY.text:
+        name = "Empty"
+        styles["shape"] = "rect"
+
+    if node.tag == RNG_ANY_NAME.text:
+        name = "anyName"
+        styles["shape"] = "rect"
+
+    if node.tag == RNG_DIV.text:
+        name = "div"
+        styles["shape"] = "rect"
+
+    if node.tag == A_DOC.text:
+        name = node.text
+
+    return identifier, name, styles
+
+
+# Maybe it's not necessary to handover the graph every time
+# It should be possible to create Nodes and Edges without the
+# graph object via pydot.
+def visualize(node, graph, parent=None, counter=0):
+    # The namespace of the nodes is missing and
+    # Elements from foreign namespaces are just shown in
+    # the clark notation.
+
+    # Handle the root element of the tree
+    if parent is None:
+        parent, root, styles = t_node(counter, node)
+        graph.node(parent, root, styles)
+        counter += 1
+
+    children = node.getchildren()
+    if not children:
+        return counter, graph
+
+    for child in children:
+        # FIXME
+        # The function t_node keeps the transformation seperate.
+        # But it makes it is still quite difficult to add new
+        # Transformation functions. I need to improve this
+        identifier, name, styles = t_node(counter, child)
+        if child.tag == RNG_DEFINE.text or child.tag == A_DOC.text:
+            # FIXME
+            # Skip the define and the doc annotations node.
+            # Skipping means to set the parent node as new parent node not
+            # the current node.
+            #
+            # I need some kind of tooltip design for the annotation node. The
+            # doc string now will enlarge the graph enormously.
+            #
+            # It's necessary to rearrange the graph into Clusters
+            # I need to implement it like this:
+            # http://robertyu.com/wikiperdido/Pydot%20Clusters
+            counter += 1
+            counter, graph = visualize(
+                child, graph, parent=parent, counter=counter)
+        elif child.tag == RNG_REF.text:
+            xpath = "//rng:define[@name = '{}']".format(child.get("name"))
+            define = node.xpath(xpath, namespaces=NSMAP).pop()
+            counter += 1
+            counter, graph = visualize(
+                define, graph, parent=parent, counter=counter)
+        else:
+            # Iterate through all the elements in the tree and transform the
+            # tag to a visual graph node.
+            graph.node(identifier, name, styles)
+            graph.edge(parent, identifier)
+
+            # The iteration will stop if some new Element will be found in that
+            # branch.
+            if child.tag == RNG_ELEMENT.text:
+                continue
+
+            counter += 1
+            # Transform the children of the current node, too.
+            # That the identifier of the current node as parent
+            # and the child as current node.
+            counter, graph = visualize(
+                child, graph, parent=identifier, counter=counter)
+    return counter, graph
+
+
 def transform_element(element, tree):
     """Transforms a "rlxng element" element
 
@@ -372,10 +596,33 @@ def transform_element(element, tree):
         description.text = find_doc_string(element)
     transformed_element = find_children(element, transformed_element, tree)
     transformed_element = find_attributes(element, transformed_element, tree)
+    foreign_object = etree.SubElement(transformed_element, "foreignObject")
+    graph = gv.Graph(format="svg")
+    graph.graph_attr["rankdir"] = "LR"
+    _, graph = visualize(element, graph)
+    svg = etree.fromstring(graph.pipe())
+    foreign_object.append(svg)
     return transformed_element
 
 
-def transform(rngfilename, elementdef=None):
+def populate_references_map(rngtree):
+    ref_map = {}
+    for node in rngtree.iter():
+        if node.tag == RNG_DEFINE.text:
+            ref_map[node.get("name")] = node
+    return ref_map
+
+
+def add_unique_index(elements):
+    index = 0
+    for element in elements:
+        uuid = "{}".format(index)
+        element.attrib["id"] = uuid
+        index += 1
+    return elements
+
+
+def transform(rngfilename):
     """Read RNG file and transform it to the XML-Documentation format
 
      :param rngfilename: path to the RNG file (in XML format)
@@ -383,7 +630,9 @@ def transform(rngfilename, elementdef=None):
      :return: The ElementTree of the new XML document
      :rtype: etree.ElementTree
     """
-    xmlparser = None
+    # Remove all blank lines, which makes the output later much more beautiful
+    # :-)
+    xmlparser = etree.XMLParser(remove_blank_text=True)
 
     rngtree = etree.parse(rngfilename, xmlparser)
 
@@ -392,15 +641,38 @@ def transform(rngfilename, elementdef=None):
         raise NoMatchinRootException("Wrong namespace in root element %s. "
                                      "Expected namespace from RELAX NG" % root.text)
 
-    documentation = etree.Element("documentation")
+#   Generates a define map which make it easier to find the define for on ref.
+#   Maybe this is too memory expensive and a xpath expression like
+#   xpath(//define[@name = $ref]) is faster and more efficient.
+#    refs = rngtree.xpath("//rng:ref", namespaces=NSMAP)
+#    define_map = populate_references_map(rngtree)
+
+#   It's not possible to resolve all links because of the recursive ref feature
+#   of RELAX NG.
+#      for ref in refs:
+#          try:
+#              parent = ref.getparent()
+#              parent.insert(
+#                  parent.index(ref)+1,
+#                  define_map[ref.get("name")]
+#              )
+#              parent.remove(ref)
+#          except:
+#              print(ref.get("name"))
+
     elements = rngtree.xpath("//rng:element", namespaces=NSMAP)
-    index = 0
+#   Adds a unique id for every element in the tree
+    elements = add_unique_index(elements)
+
+
+#   The root element of my output format
+    documentation = etree.Element("documentation")
+
+#   Collect information about every element in the schema and transform it
+#   to the output format.
     for element in elements:
-        uuid = "{}".format(index)
-        element.attrib["id"] = uuid
-        index += 1
-    for element in elements:
-        documentation.append(transform_element(element, rngtree))
+        documentation.append(
+            transform_element(element, rngtree))
     return etree.ElementTree(documentation)
 
 

@@ -68,30 +68,31 @@ NSMAP = dict(a="http://relaxng.org/ns/compatibility/annotations/1.0",
              xlink="http://www.w3.org/1999/xlink"
              )
 
-#: RNG element ``element``
-RNG_ELEMENT = QName(NSMAP['rng'], "element")
-
-#: RNG element ``attribute``
-RNG_ATTRIBUTE = QName(NSMAP['rng'], "attribute")
-
-#: RNG element ``ref``
-RNG_REF = QName(NSMAP['rng'], "ref")
-
-#: RNG element ``define``
+RNG_GRAMMAR = QName(NSMAP['rng'], "grammar")
+RNG_START = QName(NSMAP['rng'], "start")
+RNG_INCLUDE = QName(NSMAP['rng'], "include")
 RNG_DEFINE = QName(NSMAP['rng'], "define")
-
+RNG_REF = QName(NSMAP['rng'], "ref")
+RNG_EXTERNAL_REF = QName(NSMAP['rng'], "externalRef")
+RNG_ELEMENT = QName(NSMAP['rng'], "element")
+RNG_ATTRIBUTE = QName(NSMAP['rng'], "attribute")
+RNG_ZERO_OR_MORE = QName(NSMAP['rng'], "zeroOrMore")
+RNG_ONE_OR_MORE = QName(NSMAP['rng'], "oneOrMore")
+RNG_LIST = QName(NSMAP['rng'], "list")
+RNG_GROUP = QName(NSMAP['rng'], "group")
 RNG_OPTIONAL = QName(NSMAP['rng'], "optional")
-
-RNG_DATA = QName(NSMAP['rng'], "data")
-
-RNG_TEXT = QName(NSMAP['rng'], "text")
-
+RNG_INTERLEAVE = QName(NSMAP['rng'], "interleave")
 RNG_CHOICE = QName(NSMAP['rng'], "choice")
-
+RNG_DATA = QName(NSMAP['rng'], "data")
+RNG_TEXT = QName(NSMAP['rng'], "text")
+RNG_EMPTY = QName(NSMAP['rng'], "empty")
 RNG_PARAM = QName(NSMAP['rng'], "param")
-
 RNG_VALUE = QName(NSMAP['rng'], "value")
-
+RNG_ANY_NAME = QName(NSMAP['rng'], "anyName")
+RNG_NS_NAME = QName(NSMAP['rng'], "nsName")
+RNG_EXCEPT = QName(NSMAP['rng'], "except")
+RNG_DIV = QName(NSMAP['rng'], "div")
+RNG_MIXED = QName(NSMAP['rng'], "mixed")
 A_DOC = QName(NSMAP['a'], "documentation")
 
 #: Map verbosity to log levels
