@@ -12,6 +12,8 @@ pipelines:
           - pip
         script: # Modify the commands below to build your repository.
           # - python3 -m venv .env && source .env/bin/activate
+          # install deps
+          - apt-get update && apt-get install -y graphviz
           - pip install -U pip
           - pip install -r devel-requirements.txt
           - tox -e py35
@@ -19,6 +21,8 @@ pipelines:
     master:
       - step:
           script:
+            # install deps
+            - apt-get update && apt-get install -y graphviz
             - pip install -U pip
             - pip install -r devel-requirements.txt
             - tox -e py35
@@ -27,6 +31,8 @@ pipelines:
           caches:
             - pip
           script:
+            # install deps
+            - apt-get update && apt-get install -y graphviz
             - pip install -U pip
             - pip install -r devel-requirements.txt
             - tox -e check,py35

@@ -6,42 +6,38 @@
 import logging
 
 # Third Party Libraries
-import graphviz as gv
+import graphviz
 from lxml import etree
 
 # Local imports
-from .common import (A_DOC,
+from .exceptions import NoMatchinRootException
+
+from .common import (A_DOC,  # RNG_GRAMMAR,; RNG_START,; RNG_INCLUDE,; RNG_EXTERNAL_REF,
+                     DB_PARA,
                      NSMAP,
-                     # RNG_GRAMMAR,
-                     # RNG_START,
-                     # RNG_INCLUDE,
-                     RNG_DEFINE,
-                     RNG_REF,
-                     # RNG_EXTERNAL_REF,
-                     RNG_ELEMENT,
+                     RNG_ANY_NAME,
                      RNG_ATTRIBUTE,
-                     RNG_ZERO_OR_MORE,
-                     RNG_ONE_OR_MORE,
-                     RNG_LIST,
-                     RNG_GROUP,
-                     RNG_OPTIONAL,
-                     RNG_INTERLEAVE,
                      RNG_CHOICE,
                      RNG_DATA,
-                     RNG_TEXT,
-                     RNG_PARAM,
-                     RNG_VALUE,
-                     RNG_ANY_NAME,
-                     RNG_NS_NAME,
-                     RNG_EXCEPT,
+                     RNG_DEFINE,
                      RNG_DIV,
+                     RNG_ELEMENT,
                      RNG_EMPTY,
-                     DB_PARA,
-                     SCH_PATTERN,
+                     RNG_EXCEPT,
+                     RNG_GROUP,
+                     RNG_INTERLEAVE,
+                     RNG_LIST,
+                     RNG_NS_NAME,
+                     RNG_ONE_OR_MORE,
+                     RNG_OPTIONAL,
+                     RNG_PARAM,
+                     RNG_REF,
+                     RNG_TEXT,
+                     RNG_VALUE,
+                     RNG_ZERO_OR_MORE,
                      SCH_PARAM,
-                     SCH_RULE,
-)
-from .exceptions import NoMatchinRootException
+                     SCH_PATTERN,
+                     SCH_RULE)
 
 log = logging.getLogger(__name__)
 
@@ -449,7 +445,7 @@ def t_node(index, node):
 
     if node.tag == RNG_PARAM.text:
         param_name = node.get("name")
-        param_value = node.text
+        # param_value = node.text
         # name = "{} = {}".format(param_name, param_value)
         name = param_name
         styles["shape"] = "ellipse"
@@ -542,26 +538,22 @@ def visualize(node, graph, simple=True, parent=None, counter=0):
         # But it makes it is still quite difficult to add new
         # Transformation functions. I need to improve this
         identifier, name, styles = t_node(counter, child)
-        
+
         # The simple mode will add only the children of the
         # type RNG_ELEMENT and RNG_ATTRIBUTE to the graph
-        if(
-             simple and
-             child.tag != RNG_ELEMENT.text and
-             child.tag != RNG_ATTRIBUTE.text and
-             child.tag != RNG_REF
-          ):
+        if(simple and
+           child.tag != RNG_ELEMENT.text and
+           child.tag != RNG_ATTRIBUTE.text and
+           child.tag != RNG_REF):
             counter += 1
             counter, graph = visualize(
-                child, graph, parent=parent, counter=counter)     
-        elif(
-            child.tag == RNG_DEFINE.text or 
-            child.tag == A_DOC.text or
-            child.tag == DB_PARA.text or
-            child.tag == SCH_PARAM.text or
-            child.tag == SCH_PATTERN.text or
-            child.tag == SCH_RULE
-          ):
+                child, graph, parent=parent, counter=counter)
+        elif(child.tag == RNG_DEFINE.text or
+             child.tag == A_DOC.text or
+             child.tag == DB_PARA.text or
+             child.tag == SCH_PARAM.text or
+             child.tag == SCH_PATTERN.text or
+             child.tag == SCH_RULE):
             # FIXME
             # Skip the define and the doc annotations node.
             # Skipping means to set the parent node as new parent node not
@@ -626,7 +618,7 @@ def transform_element(element, tree):
         description.text = find_doc_string(element)
     transformed_element = find_children(element, transformed_element, tree)
     transformed_element = find_attributes(element, transformed_element, tree)
-    graph = gv.Graph(format="svg")
+    graph = graphviz.Graph(format="svg")
     graph.graph_attr["rankdir"] = "LR"
     _, graph = visualize(element, graph)
     svg = etree.fromstring(graph.pipe())
@@ -663,7 +655,12 @@ def transform(rngfilename):
     # :-)
     xmlparser = etree.XMLParser(remove_blank_text=True, remove_comments=True)
 
+    relaxng_doc = etree.parse("http://relaxng.org/relaxng.rng")
+    relaxng = etree.RelaxNG(relaxng_doc)
     rngtree = etree.parse(rngfilename, xmlparser)
+
+    if not relaxng.validate(rngtree):
+        raise RuntimeError("The input file is not a valid RELAX NG document.")
 
     root = etree.QName(rngtree.getroot())
     if root.namespace != NSMAP['rng']:

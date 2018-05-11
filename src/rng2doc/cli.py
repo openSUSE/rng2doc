@@ -123,5 +123,9 @@ def main(cliargs=None):
         log.fatal("Failed to parse the XML input file  '%s'", error)
         return errorcode(error)
 
+    except RuntimeError as error:
+        log.fatal("Something failed  '%s'", error)
+        return 1
+
     except KeyboardInterrupt as error:
         return errorcode(error)

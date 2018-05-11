@@ -5,7 +5,7 @@ from unittest.mock import patch
 # Third Party Libraries
 import pytest
 from lxml import etree
-from lxml.etree import XMLSyntaxError
+from lxml.etree import RelaxNGParseError, XMLSyntaxError
 
 # My Stuff
 from rng2doc.exceptions import NoMatchinRootException
@@ -28,11 +28,11 @@ def test_transform(mock_parse):
         return etree.XML("""<wrongelement xmlns="urn:x-test:wrong-ns"/>""").getroottree()
 
     mock_parse.side_effect = xmltree
-    with pytest.raises(NoMatchinRootException):
+    with pytest.raises(RelaxNGParseError):
         transform("fake.rng")
 
 @pytest.mark.parametrize('xml,expected', [
-    ("""<element name="test" xmlns="http://relaxng.org/ns/structure/1.0"/>""",
+    ("""<element name="test" xmlns="http://relaxng.org/ns/structure/1.0"><text/></element>""",
      # The expected result looks like:
      # -------------------------------
      # <documentation>
@@ -51,7 +51,9 @@ def test_transform(mock_parse):
     ),
     ("""<grammar xmlns="http://relaxng.org/ns/structure/1.0">
           <start>
-            <element name="test"/>
+            <element name="test">
+              <text/>
+            </element>
           </start>
         </grammar>""",
      # The expected result looks like:
@@ -71,7 +73,9 @@ def test_transform(mock_parse):
      ]
     ),
     ("""<element name="root" xmlns="http://relaxng.org/ns/structure/1.0">
-          <element name="test"/>
+          <element name="test">
+            <text/>
+          </element>
         </element>""",
      # The expected result looks like:
      # -------------------------------
@@ -98,8 +102,8 @@ def test_transform(mock_parse):
 
     ),
     ("""<element name="root" xmlns="http://relaxng.org/ns/structure/1.0">
-          <element name="test1"></element>
-          <element name="test2"></element>
+          <element name="test1"><text/></element>
+          <element name="test2"><text/></element>
         </element>""",
      # The expected result looks like:
      # -------------------------------

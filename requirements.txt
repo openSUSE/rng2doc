@@ -3,3 +3,4 @@
 lxml
 docopt
 jinja2
+graphviz
