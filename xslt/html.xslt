@@ -1,8 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+   Purpose:
+     TODO
+
+   Parameters:
+    * na (not available): defaults to "-" for objects which are empty
+    * sep (separator): defaults to ", " to separate list-like entries
+
+   Input:
+     TODO
+
+   Output:
+     TODO
+
+   Author:  Jürgen Löhel
+   Date:    2018
+-->
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
   <xsl:output method="html" doctype-system="about:legacy-compat" encoding="utf-8" indent="yes" />
   <xsl:include href="svg.xslt"/>
 
+  <!-- === Parameters -->
+  <xsl:param name="na"><xsl:text>-</xsl:text></xsl:param>
+  <xsl:param name="sep"><xsl:text>, </xsl:text></xsl:param>
+
+  <!-- toms 2018-05-11
+    Just a hint: if your root element is /documentation, you don't need this template
+    rule as it's already implied by XSLT.
+    You can remove it (but if you want to keep it for readability reasons, it's fine).
+  -->
   <xsl:template match="/">
     <xsl:apply-templates select="documentation"/>
   </xsl:template>
@@ -18,7 +44,7 @@
             <h1>Elemente</h1>
             <xsl:for-each select="element[count(. | key('first_letters', substring(@name, 1, 1))[1]) = 1]">
                 <xsl:sort select="@name" />
-                <xsl:variable name="counter_hack" select="position() - 1"/>                
+                <xsl:variable name="counter_hack" select="position() - 1"/>
                 <xsl:variable name="first_letter" select="substring(@name, 1, 1)" />
                 <xsl:if test="$counter_hack mod 3 = 0">
                   <xsl:text disable-output-escaping="yes"><![CDATA[<div class="row index">]]></xsl:text>
@@ -51,21 +77,26 @@
   </xsl:template>  
 
   <xsl:template match="element" mode="visualize">
+    <!-- toms 2018-05-11
+      IMHO this template rule is a bit long. As you have already a "visualize" mode,
+      you could split this rule into smaller parts which only handles the specific
+      cases for namespace, parent elements, child elements etc.
+      In this rule you call the other parts.
+    -->
     <xsl:variable name="id" select="@id"/> 
     <div class="card" id="element{$id}" name="element{$id}">
-      <div class="card-header">
-        Element
-      </div>
+      <div class="card-header">Element</div>
       <div class="card-body">
         <h5 class="card-title"><xsl:value-of select="@name"/></h5>
         <h6 class="card-subtitle mb-2 text-muted">
+          <!-- toms 2018-05-11: Not sure about the &nbsp; after "Namensraum" -->
           Namensraum:<xsl:text disable-output-escaping="yes"><![CDATA[&nbsp;]]></xsl:text>
           <xsl:choose>
             <xsl:when test="boolean(namespace/text())">
               <xsl:value-of select="namespace"/>
             </xsl:when>
             <xsl:otherwise>
-              -
+              <xsl:value-of select="$na"/>
             </xsl:otherwise>
           </xsl:choose>
         </h6>
@@ -78,14 +109,21 @@
         <ul class="list-group list-group-flush">
           <li class="list-group-item">
             <span class="lead">Vaterelemente:</span>
+            <!-- toms 2018-05-11:
+              Hmn, this could be done by xsl:key and the key() function...
+              Sketching an idea (not sure if this works):
+              <xsl:key name="parents" match="child" use="@id"/>
+              ...
+              key('id', $id)/parent::element
+            -->
             <xsl:variable name="parents" select="//element/child[@id = $id]/parent::element"/>
             <xsl:choose>
-              <xsl:when test="$parents">  
+              <xsl:when test="$parents">
                 <xsl:text disable-output-escaping="yes"><![CDATA[&nbsp;]]></xsl:text>
                 <xsl:apply-templates select="$parents" mode="parent"/>
               </xsl:when>
               <xsl:otherwise>
-                -
+                <xsl:value-of select="$na"/>
               </xsl:otherwise>
             </xsl:choose>
           </li>
@@ -99,13 +137,14 @@
                   <xsl:apply-templates select="child"/>
                 </xsl:when>
                 <xsl:otherwise>
-                  -
+                  <xsl:value-of select="$na"/>
                 </xsl:otherwise>
               </xsl:choose>
           </li>
         </ul>
         <br/>
         <h5 class="card-title">Attribute</h5>
+        <!-- toms 2018-05-11: Shouldn't the <hr/> be done by CSS? -->
         <hr/>
         <div class="card-columns">
           <xsl:choose>
@@ -125,7 +164,7 @@
   <xsl:template match="element" mode="parent">
     <a href ="#element{@id}"><xsl:value-of select="@name"/></a>
     <xsl:if test="position() != last()">
-         <xsl:text>, </xsl:text>
+       <xsl:value-of select="$sep"/>
     </xsl:if>
   </xsl:template>
 
@@ -133,8 +172,8 @@
     <xsl:variable name="id" select="@id"/> 
     <a href="#element{@id}"><xsl:value-of select="//element[@id = $id]/@name"/></a>
     <xsl:if test="position() != last()">
-         <xsl:text>, </xsl:text>
-    </xsl:if> 
+       <xsl:value-of select="$sep"/>
+    </xsl:if>
   </xsl:template>
 
   <xsl:template match="attribute">
@@ -148,7 +187,7 @@
               <xsl:value-of select="namespace"/>
             </xsl:when>
             <xsl:otherwise>
-              -
+              <xsl:value-of select="$na"/>
             </xsl:otherwise>
           </xsl:choose>
         </h6>
@@ -179,7 +218,7 @@
               </xsl:choose>
             </tr>
           </tbody>
-        </table> 
+        </table>
       </div>
     </div>
   </xsl:template>

@@ -1,4 +1,20 @@
 <?xml version="1.0"?>
+<!--
+   Purpose:
+     TODO
+
+   Parameters:
+    * fontfamily: The font used in the text
+
+   Input:
+     TODO
+
+   Output:
+     TODO
+
+   Author:  Jürgen Löhel
+   Date:    2018
+-->
 <xsl:stylesheet version="1.0" 
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns="http://www.w3.org/2000/svg">
@@ -12,8 +28,14 @@
     doctype-system="http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"
     media-type="image/svg"/>
 
+  <xsl:param name="fontfamily">Consolas,monaco,monospace;</xsl:param>
+
   <xsl:template match="/">
     <xsl:call-template name="transform_element_to_svg">
+      <!-- toms 2018-105-11:
+        Isn't the first element always /documentation/element[1]?
+        If yes, you could simplify the XPath.
+      -->
       <xsl:with-param name="element" select="//element[1]"/>
     </xsl:call-template>
   </xsl:template>
@@ -84,12 +106,9 @@
             <xsl:with-param name="height_element" select="$height_element"/>
             <xsl:with-param name="font_size" select="$font_size"/>
             <xsl:with-param name="element" select="$element"/>
-          </xsl:call-template>  
+          </xsl:call-template>
         </xsl:otherwise>
       </xsl:choose>
-
-
-
     </svg>
   </xsl:template>
 
@@ -158,7 +177,7 @@
     <text
        x="{$x_pos_text}"
        y="{$y_pos_text}"
-       font-family="Consolas,monaco,monospace;"
+       font-family="{$fontfamily}"
        font-size="12"
        style="fill:white"
        text-anchor="middle"
