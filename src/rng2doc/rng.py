@@ -35,7 +35,12 @@ from .common import (A_DOC,
                      RNG_NS_NAME,
                      RNG_EXCEPT,
                      RNG_DIV,
-                     RNG_EMPTY)
+                     RNG_EMPTY,
+                     DB_PARA,
+                     SCH_PATTERN,
+                     SCH_PARAM,
+                     SCH_RULE,
+)
 from .exceptions import NoMatchinRootException
 
 log = logging.getLogger(__name__)
@@ -404,7 +409,9 @@ def find_attributes(element, output, tree):
 def t_node(index, node):
     identifier = "node{}".format(index)
     name = node.tag
-    styles = {}
+    styles = {
+        "width": "0.6",
+    }
 
     if node.tag == RNG_ELEMENT.text:
         identifier = "{}{}".format(
@@ -443,13 +450,16 @@ def t_node(index, node):
     if node.tag == RNG_PARAM.text:
         param_name = node.get("name")
         param_value = node.text
-        name = "{} = {}".format(param_name, param_value)
+        # name = "{} = {}".format(param_name, param_value)
+        name = param_name
         styles["shape"] = "ellipse"
         styles["style"] = "filled"
         styles["fillcolor"] = "#f9d368"
 
     if node.tag == RNG_NS_NAME.text:
         namespace = node.get("ns")
+        if namespace is None:
+            namespace = "No Namespace"
         name = namespace
         styles["shape"] = "ellipse"
 
@@ -510,7 +520,7 @@ def t_node(index, node):
 # Maybe it's not necessary to handover the graph every time
 # It should be possible to create Nodes and Edges without the
 # graph object via pydot.
-def visualize(node, graph, parent=None, counter=0):
+def visualize(node, graph, simple=True, parent=None, counter=0):
     # The namespace of the nodes is missing and
     # Elements from foreign namespaces are just shown in
     # the clark notation.
@@ -526,12 +536,32 @@ def visualize(node, graph, parent=None, counter=0):
         return counter, graph
 
     for child in children:
+
         # FIXME
         # The function t_node keeps the transformation seperate.
         # But it makes it is still quite difficult to add new
         # Transformation functions. I need to improve this
         identifier, name, styles = t_node(counter, child)
-        if child.tag == RNG_DEFINE.text or child.tag == A_DOC.text:
+        
+        # The simple mode will add only the children of the
+        # type RNG_ELEMENT and RNG_ATTRIBUTE to the graph
+        if(
+             simple and
+             child.tag != RNG_ELEMENT.text and
+             child.tag != RNG_ATTRIBUTE.text and
+             child.tag != RNG_REF
+          ):
+            counter += 1
+            counter, graph = visualize(
+                child, graph, parent=parent, counter=counter)     
+        elif(
+            child.tag == RNG_DEFINE.text or 
+            child.tag == A_DOC.text or
+            child.tag == DB_PARA.text or
+            child.tag == SCH_PARAM.text or
+            child.tag == SCH_PATTERN.text or
+            child.tag == SCH_RULE
+          ):
             # FIXME
             # Skip the define and the doc annotations node.
             # Skipping means to set the parent node as new parent node not
@@ -596,12 +626,11 @@ def transform_element(element, tree):
         description.text = find_doc_string(element)
     transformed_element = find_children(element, transformed_element, tree)
     transformed_element = find_attributes(element, transformed_element, tree)
-    foreign_object = etree.SubElement(transformed_element, "foreignObject")
     graph = gv.Graph(format="svg")
     graph.graph_attr["rankdir"] = "LR"
     _, graph = visualize(element, graph)
     svg = etree.fromstring(graph.pipe())
-    foreign_object.append(svg)
+    transformed_element.append(svg)
     return transformed_element
 
 
@@ -632,7 +661,7 @@ def transform(rngfilename):
     """
     # Remove all blank lines, which makes the output later much more beautiful
     # :-)
-    xmlparser = etree.XMLParser(remove_blank_text=True)
+    xmlparser = etree.XMLParser(remove_blank_text=True, remove_comments=True)
 
     rngtree = etree.parse(rngfilename, xmlparser)
 

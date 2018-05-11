@@ -65,9 +65,11 @@ NSMAP = dict(a="http://relaxng.org/ns/compatibility/annotations/1.0",
              html="http://www.w3.org/1999/xhtml",
              rng="http://relaxng.org/ns/structure/1.0",
              s="http://purl.oclc.org/dsdl/schematron",
-             xlink="http://www.w3.org/1999/xlink"
+             xlink="http://www.w3.org/1999/xlink",
+             sch="http://purl.oclc.org/dsdl/schematron",
              )
 
+# Relax NG namespace
 RNG_GRAMMAR = QName(NSMAP['rng'], "grammar")
 RNG_START = QName(NSMAP['rng'], "start")
 RNG_INCLUDE = QName(NSMAP['rng'], "include")
@@ -93,6 +95,15 @@ RNG_NS_NAME = QName(NSMAP['rng'], "nsName")
 RNG_EXCEPT = QName(NSMAP['rng'], "except")
 RNG_DIV = QName(NSMAP['rng'], "div")
 RNG_MIXED = QName(NSMAP['rng'], "mixed")
+
+# Docbook namespace
+DB_PARA = QName(NSMAP['db'], "para")
+
+# Schematron namespace
+SCH_PATTERN = QName(NSMAP['sch'], "pattern")
+SCH_PARAM = QName(NSMAP['sch'], "param")
+SCH_RULE = QName(NSMAP['sch'], "rule")
+
 A_DOC = QName(NSMAP['a'], "documentation")
 
 #: Map verbosity to log levels

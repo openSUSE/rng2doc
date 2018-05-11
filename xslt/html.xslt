@@ -1,37 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
    Purpose:
-     TODO
+     Transforms an RELAX NG documentation into HTML
 
    Parameters:
     * na (not available): defaults to "-" for objects which are empty
     * sep (separator): defaults to ", " to separate list-like entries
 
    Input:
-     TODO
+     A XML document ...
 
    Output:
-     TODO
+     A HTML document ...
 
    Author:  Jürgen Löhel
    Date:    2018
 -->
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+<xsl:stylesheet version="1.0"
+  xmlns:s="http://www.w3.org/2000/svg"
+  xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
   <xsl:output method="html" doctype-system="about:legacy-compat" encoding="utf-8" indent="yes" />
-  <xsl:include href="svg.xslt"/>
 
   <!-- === Parameters -->
   <xsl:param name="na"><xsl:text>-</xsl:text></xsl:param>
   <xsl:param name="sep"><xsl:text>, </xsl:text></xsl:param>
-
-  <!-- toms 2018-05-11
-    Just a hint: if your root element is /documentation, you don't need this template
-    rule as it's already implied by XSLT.
-    You can remove it (but if you want to keep it for readability reasons, it's fine).
-  -->
-  <xsl:template match="/">
-    <xsl:apply-templates select="documentation"/>
-  </xsl:template>
 
   <xsl:key name="first_letters" match="element" use="substring(@name, 1, 1)"/>
   <xsl:template match="documentation">
@@ -102,9 +94,7 @@
         </h6>
         <p class="card-text"><xsl:value-of select="description"/></p>
         <div class="svg">
-          <xsl:call-template name="transform_element_to_svg">
-            <xsl:with-param name="element" select="."/>
-          </xsl:call-template>
+          <xsl:apply-templates select="s:svg"/>
         </div>
         <ul class="list-group list-group-flush">
           <li class="list-group-item">
@@ -253,6 +243,10 @@
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
+  </xsl:template>
+
+  <xsl:template match="s:svg">
+    <xsl:copy-of select="."/>
   </xsl:template>
 
   <xsl:template name="style">
