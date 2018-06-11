@@ -9,27 +9,27 @@ from lxml.etree import RelaxNGParseError, XMLSyntaxError
 
 # My Stuff
 from rng2doc.exceptions import NoMatchinRootException
-from rng2doc.rng import process, transform
+from rng2doc.rng import parse, transform
 
 PARSER = etree.XMLParser(remove_blank_text=True)
 
 @patch('rng2doc.rng.etree.parse')
-def test_transform_empty(mock_parse):
+def test_parse_empty(mock_parse):
     def xmltree(source, parser=None, base_url=None):
         return etree.XML("""""").getroottree()
 
     mock_parse.side_effect = xmltree
     with pytest.raises(XMLSyntaxError):
-        transform("fake.rng")
+        parse("fake.rng")
 
 @patch('rng2doc.rng.etree.parse')
-def test_transform(mock_parse):
+def test_parse(mock_parse):
     def xmltree(source, parser=None, base_url=None):
         return etree.XML("""<wrongelement xmlns="urn:x-test:wrong-ns"/>""").getroottree()
 
     mock_parse.side_effect = xmltree
     with pytest.raises(RelaxNGParseError):
-        transform("fake.rng")
+        parse("fake.rng")
 
 @pytest.mark.parametrize('xml,expected', [
     ("""<element name="test" xmlns="http://relaxng.org/ns/structure/1.0"><text/></element>""",
@@ -38,14 +38,12 @@ def test_transform(mock_parse):
      # <documentation>
      #   <element name="test">
      #     <namespace/>
-     #     <description/>
      #   </element>
      # </documentation>
      [
          ("local-name(/*)", "documentation"),
          ("count(//element)", 1),
          ("boolean(//element/namespace)", True),
-         ("boolean(//element/description)", True),
          ("boolean(/documentation/element[@name = 'test'])", True),
      ]
     ),
@@ -61,14 +59,12 @@ def test_transform(mock_parse):
      # <documentation>
      #  <element name="test">
      #    <namespace/>
-     #    <description/>
      #   </element>
      # </documentation>
      [
          ("local-name(/*)", "documentation"),
          ("count(//element)", 1),
          ("boolean(//element/namespace)", True),
-         ("boolean(//element/description)", True),
          ("boolean(/documentation/element[@name = 'test'])", True),
      ]
     ),
@@ -82,19 +78,16 @@ def test_transform(mock_parse):
      # <documentation>
      #   <element id="0" name="root">
      #     <namespace/>
-     #     <description/>
      #     <child id="1"/>
      #   </element>
      #   <element id="1" name="test">
      #     <namespace/>
-     #     <description/>
      #   </element>
      # </documentation>
      [
          ("local-name(/*)", "documentation"),
          ("count(//element)", 2),
          ("boolean(//element/namespace)", True),
-         ("boolean(//element/description)", True),
          ("boolean(/documentation/element[@name = 'root'])", True),
          ("boolean(/documentation/element[@name = 'root']/child[@id = '1'])", True),
          ("boolean(/documentation/element[@name = 'test'])", True),
@@ -110,24 +103,20 @@ def test_transform(mock_parse):
      # <documentation>
      #   <element id='0' name="root">
      #     <namespace/>
-     #     <description/>
      #     <child id="1"/>
      #     <child id="2"/>
      #   </element>
      #   <element id='1' name="test1">
      #     <namespace/>
-     #     <description/>
      #   </element>
      #   <element id='2' name="test2">
      #     <namespace/>
-     #     <description/>
      #   </element>
      # </documentation>
      [
          ("local-name(/*)", "documentation"),
          ("count(//element)", 3),
          ("boolean(//element/namespace)", True),
-         ("boolean(//element/description)", True),
          ("boolean(/documentation/element[@name = 'root'])", True),
          ("boolean(/documentation/element[@name = 'root']/child[@id = '1'])", True),
          ("boolean(/documentation/element[@name = 'root']/child[@id = '2'])", True),
@@ -137,7 +126,7 @@ def test_transform(mock_parse):
     )
 ])
 def test_transform_element(xml, expected):
-    result = transform(io.StringIO(xml))
+    result = parse(io.StringIO(xml))
     assert isinstance(result, etree._ElementTree)
     for xpath, expected_value in expected:
         assert result.xpath(xpath) == expected_value
@@ -151,29 +140,21 @@ def test_transform_element(xml, expected):
      # <documentation>
      #   <element name="root">
      #     <namespace/>
-     #     <description/>
-     #     <attribute>
-     #       <name>test</name>
+     #     <attribute name="test">
      #       <namespace/>
-     #       <description/>
-     #       <type name="text">
-     #         <description/>
-     #         <param/>
-     #       </type>
+     #       <type name="text"/>
      #       <use>required</use>
      #     </attribute>
      #   </element>
      # </documentation>
      [
          ("local-name(/*)", "documentation"),
-         ("boolean(//attribute/name)", True),
          ("boolean(//attribute/namespace)", True),
-         ("boolean(//attribute/description)", True),
+         ("boolean(//attribute[@name = 'test'])", True),
          ("boolean(//attribute/type)", True),
+         ("boolean(//attribute/type[@name = 'text'])", True),
          ("boolean(//attribute/use)", True),
          ("count(/documentation/element[@name = 'root']/attribute)", 1),
-         ("/documentation/element[@name = 'root']/attribute[1]/name/text()",
-           ["test"]),
      ]
     ),
     ("""<element name="root" xmlns="http://relaxng.org/ns/structure/1.0">
@@ -186,64 +167,47 @@ def test_transform_element(xml, expected):
      # The expected result looks like:
      # -------------------------------
      # <documentation>
-     #   <element name="root">
+     #   <element name="root" id="0">
      #     <namespace/>
-     #     <description/>
-     #     <child id="element1"/>
-     #     <attribute>
-     #       <name>test</name>
+     #     <child id="1"/>
+     #     <attribute name="test">
      #       <namespace/>
-     #       <description/>
-     #       <type name="text">
-     #         <description/>
-     #         <param/>
-     #       </type>
+     #       <type name="text"/>
      #       <use>required</use>
      #     </attribute>
-     #     <attribute>
-     #       <name>test2</name>
+     #     <attribute name="test2">
      #       <namespace/>
-     #       <description/>
-     #       <type name="text">
-     #         <description/>
-     #         <param/>
-     #       </type>
+     #       <type name="text"/>
      #       <use>required</use>
      #     </attribute>
      #   </element>
-     #   <element name="element1">
+     #   <element name="element1" id="1">
      #     <namespace/>
-     #     <description/>
-     #     <attribute>
-     #       <name>test3</name>
+     #     <attribute name="test3">
      #       <namespace/>
-     #       <description/>
-     #       <type name="text">
-     #         <description/>
-     #         <param/>
-     #       </type>
+     #       <type name="text"/>
      #       <use>required</use>
      #     </attribute>
      #   </element>
      # </documentation>
      [
          ("local-name(/*)", "documentation"),
-         ("boolean(//attribute/name)", True),
          ("boolean(//attribute/namespace)", True),
-         ("boolean(//attribute/description)", True),
          ("boolean(//attribute/type)", True),
          ("boolean(//attribute/use)", True),
          ("count(/documentation/element[@name = 'root']/attribute)", 2),
          ("count(/documentation/element[@name = 'element1']/attribute)", 1),
-         ("/documentation/element[@name = 'root']/attribute[1]/name/text()",
-           ["test1"]),
-         ("/documentation/element[@name = 'root']/attribute[2]/name/text()",
-           ["test2"]),
+         ("boolean(/documentation/element[@name = 'root']/attribute[@name = 'test1'])",
+           True),
+         ("boolean(/documentation/element[@name = 'root']/attribute[@name = 'test2'])",
+           True),
+         ("boolean(/documentation/element[@name = 'element1']/attribute[@name = 'test3'])",
+           True),
      ]
     ),
 ])
 def test_transform_attribute(xml, expected):
-    result = transform(io.StringIO(xml))
+    result = parse(io.StringIO(xml))
     assert isinstance(result, etree._ElementTree)
     for xpath, expected_value in expected:
         assert result.xpath(xpath) == expected_value
@@ -259,15 +223,9 @@ def test_transform_attribute(xml, expected):
      # <documentation>
      #   <element name="root">
      #     <namespace/>
-     #     <description/>
-     #     <attribute>
-     #       <name>test</name>
+     #     <attribute name="test">
      #       <namespace/>
-     #       <description/>
-     #       <type name="text">
-     #         <description/>
-     #         <param/>
-     #       </type>
+     #       <type name="text"/>
      #       <use>optional</use>
      #     </attribute>
      #   </element>
@@ -275,8 +233,8 @@ def test_transform_attribute(xml, expected):
      [
          ("local-name(/*)", "documentation"),
          ("count(/documentation/element[@name = 'root']/attribute)", 1),
-         ("/documentation/element[@name = 'root']/attribute[1]/name/text()",
-          ["test"]),
+         ("boolean(/documentation/element[@name = 'root']/attribute[@name = 'test'])",
+           True),
          ("/documentation/element[@name = 'root']/attribute[1]/use/text()",
           ["optional"]),
      ]
@@ -289,15 +247,9 @@ def test_transform_attribute(xml, expected):
      # <documentation>
      #   <element name="root">
      #     <namespace/>
-     #     <description/>
-     #     <attribute>
-     #       <name>test</name>
+     #     <attribute name="test">
      #       <namespace/>
-     #       <description/>
-     #       <type name="text">
-     #         <description/>
-     #         <param/>
-     #       </type>
+     #       <type name="text"/>
      #       <use>required</use>
      #     </attribute>
      #   </element>
@@ -305,15 +257,15 @@ def test_transform_attribute(xml, expected):
      [
          ("local-name(/*)", "documentation"),
          ("count(/documentation/element[@name = 'root']/attribute)", 1),
-         ("/documentation/element[@name = 'root']/attribute[1]/name/text()",
-          ["test"]),
+         ("boolean(/documentation/element[@name = 'root']/attribute[@name = 'test'])",
+           True),
          ("/documentation/element[@name = 'root']/attribute[1]/use/text()",
           ["required"]),
      ]
     ),
 ])
 def test_transform_optional(xml, expected):
-    result = transform(io.StringIO(xml))
+    result = parse(io.StringIO(xml))
     assert isinstance(result, etree._ElementTree)
     for xpath, expected_value in expected:
         assert result.xpath(xpath) == expected_value
@@ -336,14 +288,10 @@ def test_transform_optional(xml, expected):
      #   <element name="root">
      #     <namespace/>
      #     <description>This is a test element.</description>
-     #     <attribute>
-     #       <name>test</name>
+     #     <attribute name="test">
      #       <namespace/>
      #       <description>This is a test attribute.</description>
-     #       <type name="text">
-     #         <description/>
-     #         <param/>
-     #       </type>
+     #       <type name="text"/>
      #       <use>optional</use>
      #     </attribute>
      #   </element>
@@ -358,7 +306,7 @@ def test_transform_optional(xml, expected):
     ),
 ])
 def test_transform_annotations(xml, expected):
-    result = transform(io.StringIO(xml))
+    result = parse(io.StringIO(xml))
     assert isinstance(result, etree._ElementTree)
     for xpath, expected_value in expected:
         assert result.xpath(xpath) == expected_value
@@ -373,17 +321,11 @@ def test_transform_annotations(xml, expected):
      # The expected result looks like:
      # -------------------------------
      # <documentation>
-     #   <element name="root">
+     #   <element name="root" id="0">
      #     <namespace/>
-     #     <description/>
-     #     <attribute>
-     #       <name>test_attribute</name>
+     #     <attribute name="test_attribute">
      #       <namespace/>
-     #       <description/>
-     #       <type name="string">
-     #         <description/>
-     #         <param/>
-     #       </type>
+     #       <type name="string"/>
      #       <use>required</use>
      #     </attribute>
      #   </element>
@@ -391,8 +333,6 @@ def test_transform_annotations(xml, expected):
      [
          ("local-name(/*)", "documentation"),
          ("boolean(/documentation/element[@name = 'root']/attribute/type[@name = 'string'])", True),
-         ("boolean(/documentation/element[@name = 'root']/attribute/type[@name = 'string']/param)", True),
-         ("boolean(/documentation/element[@name = 'root']/attribute/type[@name = 'string']/description)", True),
      ]
     ),
     ("""<element name="root" xmlns="http://relaxng.org/ns/structure/1.0">
@@ -407,13 +347,9 @@ def test_transform_annotations(xml, expected):
      # <documentation>
      #   <element name="root">
      #     <namespace/>
-     #     <description/>
-     #     <attribute>
-     #       <name>test_attribute</name>
+     #     <attribute name="test_attribute">
      #       <namespace/>
-     #       <description/>
      #       <type name="token">
-     #         <description/>
      #         <param name="pattern">[a-zA-Z0-9_\-\.]+</param>
      #       </type>
      #       <use>required</use>
@@ -441,14 +377,10 @@ def test_transform_annotations(xml, expected):
      # <documentation>
      #   <element name="root">
      #     <namespace/>
-     #     <description/>
-     #     <attribute>
-     #       <name>test_attribute</name>
+     #     <attribute name="test_attribute">
      #       <namespace/>
-     #       <description/>
      #       <type name="string">
      #         <description>This is a test datatype</description>
-     #         <param/>
      #       </type>
      #       <use>required</use>
      #     </attribute>
@@ -462,7 +394,7 @@ def test_transform_annotations(xml, expected):
     ),
 ])
 def test_transform_datatype(xml, expected):
-    result = transform(io.StringIO(xml))
+    result = parse(io.StringIO(xml))
     assert isinstance(result, etree._ElementTree)
     for xpath, expected_value in expected:
         assert result.xpath(xpath) == expected_value
@@ -496,30 +428,18 @@ def test_transform_datatype(xml, expected):
      # <documentation>
      #   <element name="test1">
      #     <namespace/>
-     #     <description></description>
      #     <child id="test2"/>
      #   </element>
      #   <element name="test2">
      #     <namespace/>
-     #     <description></description>
-     #     <attribute>
-     #       <name>test_attribute1</name>
+     #     <attribute name="test_attribute1">
      #       <namespace/>
-     #       <description/>
-     #       <type name="text">
-     #         <description/>
-     #         <param/>
-     #       </type>
+     #       <type name="text"/>
      #       <use>required</use>
      #     </attribute>
-     #     <attribute>
-     #       <name>test_attribute2</name>
+     #     <attribute name="test_attribute2">
      #       <namespace/>
-     #       <description/>
-     #       <type name="text">
-     #         <description/>
-     #         <param/>
-     #       </type>
+     #       <type name="text"/>
      #       <use>required</use>
      #     </attribute>
      #   </element>
@@ -528,16 +448,16 @@ def test_transform_datatype(xml, expected):
          ("local-name(/*)", "documentation"),
          ("count(/documentation/element)", 2),
          ("count(/documentation/element[@name = 'test2']/attribute)", 2),
-         ("/documentation/element[@name = 'test2']/attribute[1]/name/text()",
-          ["test_attribute1"]),
-         ("/documentation/element[@name = 'test2']/attribute[2]/name/text()",
-          ["test_attribute2"]),
+         ("boolean(/documentation/element[@name = 'test2']/attribute[@name = 'test_attribute1'])",
+           True),
+         ("boolean(/documentation/element[@name = 'test2']/attribute[@name = 'test_attribute2'])",
+           True),
      ]
 
     ),
 ])
 def test_transform_references(xml, expected):
-    result = transform(io.StringIO(xml))
+    result = parse(io.StringIO(xml))
     assert isinstance(result, etree._ElementTree)
     for xpath, expected_value in expected:
         assert result.xpath(xpath) == expected_value
@@ -567,27 +487,17 @@ def test_transform_references(xml, expected):
      # The expected result looks like:
      # -------------------------------
      # <documentation>
-     #   <element name="test1">
+     #   <element name="test1" id="0">
      #     <namespace/>
-     #     <description></description>
      #     <child id="test2"/>
      #   </element>
-     #   <element name="test2">
+     #   <element name="test2" id="1">
      #     <namespace/>
-     #     <description></description>
-     #     <attribute>
-     #       <name>test_attribute1</name>
+     #     <attribute name="test_attribute1">
      #       <namespace/>
-     #       <description/>
      #       <type name="enum">
-     #         <description/>
-     #         <param/>
-     #         <value name="value1">
-     #           <description/>
-     #         </value>
+     #         <value name="value1"/>
      #         <value name="value2"/>
-     #           <description/>
-     #         </value
      #       </type>
      #       <use>required</use>
      #     </attribute>
@@ -628,19 +538,13 @@ def test_transform_references(xml, expected):
      # <documentation>
      #   <element name="test1">
      #     <namespace/>
-     #     <description></description>
      #     <child id="test2"/>
      #   </element>
      #   <element name="test2">
      #     <namespace/>
-     #     <description></description>
-     #     <attribute>
-     #       <name>test_attribute1</name>
+     #     <attribute name="test_attribute1">
      #       <namespace/>
-     #       <description/>
      #       <type name="enum">
-     #         <description/>
-     #         <param/>
      #         <value name="value1">
      #            <description>A test value1</description>
      #         </value>
@@ -658,13 +562,14 @@ def test_transform_references(xml, expected):
          ("boolean(/documentation/element[@name = 'test2']/attribute[1]/type/value[@name = 'value1'])", True),
          ("/documentation/element[@name = 'test2']/attribute[1]/type/value[@name = 'value1']/description/text()",
            ["A test value1"]),
+         ("boolean(/documentation/element[@name = 'test2']/attribute[1]/type/value[@name = 'value2'])", True),
          ("/documentation/element[@name = 'test2']/attribute[1]/type/value[@name = 'value2']/description/text()",
            ["A test value2"]),
      ]
     ),
 ])
 def test_transform_enumerations(xml, expected):
-    result = transform(io.StringIO(xml))
+    result = parse(io.StringIO(xml))
     assert isinstance(result, etree._ElementTree)
     for xpath, expected_value in expected:
         assert result.xpath(xpath) == expected_value
@@ -692,18 +597,12 @@ def test_transform_enumerations(xml, expected):
           </define>
         </grammar>""",
      # <documentation>
-     #   <element id='0' name="anyElement">
+     #   <element id='0' name="anyName">
      #     <namespace/>
-     #     <description/>
-     #     <child id="anyElement"/>
-     #     <attribute>
-     #       <name/>
+     #     <child id="0"/>
+     #     <attribute name="anyName">
      #       <namespace/>
-     #       <description/>
-     #       <type>
-     #         <description/>
-     #         <param/>
-     #       </type>
+     #       <type/>
      #       <use>required</use>
      #     </attribute>
      #   </element>
@@ -711,14 +610,14 @@ def test_transform_enumerations(xml, expected):
      [
          ("local-name(/*)", "documentation"),
          ("count(/documentation/element)", 1),
-         ("boolean(/documentation/element[@name = 'anyElement'])", True),
-         ("boolean(/documentation/element[@name = 'anyElement']/child[1][@id = '0'])",
+         ("boolean(/documentation/element[@name = 'anyName'])", True),
+         ("boolean(/documentation/element[@name = 'anyName']/child[1][@id = '0'])",
           True),
      ]
     ),
 ])
 def test_transform_name_classes(xml, expected):
-    result = transform(io.StringIO(xml))
+    result = parse(io.StringIO(xml))
     assert isinstance(result, etree._ElementTree)
     for xpath, expected_value in expected:
         assert result.xpath(xpath) == expected_value
@@ -738,13 +637,10 @@ def test_transform_name_classes(xml, expected):
           </define>
         </grammar>""",
      # <documentation>
-     #   <element name="test">
+     #   <element name="test" id="0">
      #     <namespace/>
-     #     <description/>
-     #     <attribute>
-     #       <name>test_attribute</name>
+     #     <attribute name="test_attribute">
      #       <namespace>http://docbook.org/ns/transclusion</namespace>
-     #       <description/>
      #       <type/>
      #       <use>required</use>
      #     </attribute>
@@ -772,11 +668,8 @@ def test_transform_name_classes(xml, expected):
      # <documentation>
      #   <element name="test">
      #     <namespace/>
-     #     <description/>
-     #     <attribute>
-     #       <name>test_attribute</name>
+     #     <attribute name="test_attribute">
      #       <namespace>http://docbook.org/ns/transclusion</namespace>
-     #       <description/>
      #       <type/>
      #       <use>required</use>
      #     </attribute>
@@ -803,13 +696,10 @@ def test_transform_name_classes(xml, expected):
           </define>
         </grammar>""",
      # <documentation>
-     #   <element name="test">
+     #   <element name="trans:test">
      #     <namespace>http://docbook.org/ns/transclusion</namespace>
-     #     <description/>
-     #     <attribute>
-     #       <name>test_attribute</name>
+     #     <attribute name="test_attribute">
      #       <namespace/>
-     #       <description/>
      #       <type/>
      #       <use>required</use>
      #     </attribute>
@@ -837,11 +727,8 @@ def test_transform_name_classes(xml, expected):
      # <documentation>
      #   <element id='0' name="test">
      #     <namespace>http://www.example.com</namespace>
-     #     <description/>
-     #     <attribute>
-     #       <name>test_attribute</name>
+     #     <attribute name="test_attribute">
      #       <namespace/>
-     #       <description/>
      #       <type/>
      #       <use>required</use>
      #     </attribute>
@@ -869,11 +756,8 @@ def test_transform_name_classes(xml, expected):
      # <documentation>
      #   <element id='0' name="test">
      #     <namespace/>
-     #     <description/>
-     #     <attribute>
-     #       <name>test_attribute</name>
+     #     <attribute name="test_attribute">
      #       <namespace/>
-     #       <description/>
      #       <type/>
      #       <use>required</use>
      #     </attribute>
@@ -902,13 +786,18 @@ def test_transform_name_classes(xml, expected):
           </define>
         </grammar>""",
      # <documentation>
-     #   <element id='0' name="test">
-     #     <namespace/>
-     #     <description/>
-     #     <attribute>
-     #       <name>test_attribute</name>
+     #   <element id='0' name="test1">
+     #     <namespace>http://www.example.com</namespace>
+     #     <attribute name="test_attribute">
      #       <namespace/>
-     #       <description/>
+     #       <type/>
+     #       <use>required</use>
+     #     </attribute>
+     #   </element>
+     #   <element id='1' name="test2">
+     #     <namespace>http://www.example.com</namespace>
+     #     <attribute name="test_attribute">
+     #       <namespace/>
      #       <type/>
      #       <use>required</use>
      #     </attribute>
@@ -939,13 +828,10 @@ def test_transform_name_classes(xml, expected):
           </define>
         </grammar>""",
      # <documentation>
-     #   <element name="test">
+     #   <element name="trans:test">
      #     <namespace>http://docbook.org/ns/transclusion</namespace>
-     #     <description/>
-     #     <attribute>
-     #       <name>test_attribute</name>
+     #     <attribute name="test_attribute">
      #       <namespace/>
-     #       <description/>
      #       <type/>
      #       <use>required</use>
      #     </attribute>
@@ -962,7 +848,7 @@ def test_transform_name_classes(xml, expected):
 
 ])
 def test_transform_namespaces(xml, expected):
-    result = transform(io.StringIO(xml))
+    result = parse(io.StringIO(xml))
     assert isinstance(result, etree._ElementTree)
     for xpath, expected_value in expected:
         assert result.xpath(xpath) == expected_value

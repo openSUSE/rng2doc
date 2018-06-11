@@ -4,7 +4,6 @@
 
 pytest
 pytest-cov
-pytest-catchlog
 tox
 isort
 flake8

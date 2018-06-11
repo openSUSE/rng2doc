@@ -30,10 +30,10 @@ from lxml import etree
 # Local imports
 from . import __version__
 from .common import DEFAULT_LOGGING_DICT, LOGLEVELS, errorcode
-from .rng import process
+from .rng import parse
 
-#: Use __package__, not __name__ here to set overall logging level:
-log = logging.getLogger(__package__)
+#: Use __package__, not __name__ here to set overall LOGging level:
+LOG = logging.getLogger(__package__)
 
 
 def parsecli(cliargs=None):
@@ -48,7 +48,7 @@ def parsecli(cliargs=None):
     args = docopt(__doc__,
                   argv=cliargs, version=version)
     dictConfig(DEFAULT_LOGGING_DICT)
-    log.setLevel(LOGLEVELS.get(args['-v'], logging.DEBUG))
+    LOG.setLevel(LOGLEVELS.get(args['-v'], logging.DEBUG))
 
     return args
 
@@ -81,13 +81,20 @@ def output(result, file_path, oformat):
     :type file_path: str
     :return: None
     """
+    path, filename = os.path.split(file_path)
+    if path != "":
+        os.makedirs(path, exist_ok=True)
     if oformat == "html":
+        path = os.path.join(path, "html")
+        os.makedirs(os.path.join(path, "elements"), exist_ok=True)
         xslt_html = etree.parse("xslt/html.xslt")
         transform = etree.XSLT(xslt_html)
-        result = transform(result)
+        result = transform(
+            result, basedir="'{}'".format(path),
+            filename="'{}'".format(filename))
     if file_path:
         result.write(
-            file_path, pretty_print=True, xml_declaration=True, encoding="utf-8")
+            os.path.join(path, filename), pretty_print=True, xml_declaration=True, encoding="utf-8")
     else:
         print(etree.tostring(result, pretty_print=True, encoding="unicode"))
 
@@ -101,30 +108,30 @@ def main(cliargs=None):
     """
     try:
         args = parsecli(cliargs)
-        log.info('%s version: %s', __package__, __version__)
-        log.debug('Python version: %s', sys.version.split()[0])
-        log.debug("CLI result: %s", args)
+        LOG.info('%s version: %s', __package__, __version__)
+        LOG.debug('Python version: %s', sys.version.split()[0])
+        LOG.debug("CLI result: %s", args)
         checkargs(args)
-        result = process(args)
+        result = parse(args['RNGFILE'])
         output(result, args['--output'], args["--output-format"])
-        log.info("Done.")
+        LOG.info("Done.")
         return 0
 
     except DocoptExit as error:
-        log.fatal("Need a RELAX NG file.")
+        LOG.fatal("Need a RELAX NG file.")
         printable_usage(__doc__)
         return errorcode(error)
 
     except FileNotFoundError as error:
-        log.fatal("File not found '%s'", error)
+        LOG.fatal("File not found '%s'", error)
         return errorcode(error)
 
     except etree.XMLSyntaxError as error:
-        log.fatal("Failed to parse the XML input file  '%s'", error)
+        LOG.fatal("Failed to parse the XML input file  '%s'", error)
         return errorcode(error)
 
     except RuntimeError as error:
-        log.fatal("Something failed  '%s'", error)
+        LOG.fatal("Something failed  '%s'", error)
         return 1
 
     except KeyboardInterrupt as error:

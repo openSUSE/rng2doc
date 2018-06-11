@@ -18,12 +18,17 @@
 -->
 <xsl:stylesheet version="1.0"
   xmlns:s="http://www.w3.org/2000/svg"
-  xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+  xmlns:exsl="http://exslt.org/common"
+  exclude-result-prefixes="exsl"
+  extension-element-prefixes="exsl">
   <xsl:output method="html" doctype-system="about:legacy-compat" encoding="utf-8" indent="yes" />
 
   <!-- === Parameters -->
   <xsl:param name="na"><xsl:text>-</xsl:text></xsl:param>
   <xsl:param name="sep"><xsl:text>, </xsl:text></xsl:param>
+  <xsl:param name="basedir" select="'html'"/>
+  <xsl:param name="filename"/>
 
   <xsl:key name="first_letters" match="element" use="substring(@name, 1, 1)"/>
   <xsl:template match="documentation">
@@ -31,6 +36,9 @@
       <xsl:call-template name="head"/>
       <body>
         <xsl:call-template name="nav"/>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item active">Home</li>
+        </ol>
         <div class="container">
           <div id="index">
             <h1>Elemente</h1>
@@ -65,7 +73,7 @@
   </xsl:template>
 
   <xsl:template match="element" mode="index">
-    <li class="list-group-item"><a href="#element{@id}"><code><xsl:value-of select="@name"/></code></a></li>
+    <li class="list-group-item"><a href="elements/element_{@id}.html"><code><xsl:value-of select="@name"/></code></a></li>
   </xsl:template>  
 
   <xsl:template match="element" mode="visualize">
@@ -75,84 +83,105 @@
       cases for namespace, parent elements, child elements etc.
       In this rule you call the other parts.
     -->
-    <xsl:variable name="id" select="@id"/> 
-    <div class="card" id="element{$id}" name="element{$id}">
-      <div class="card-header">Element</div>
-      <div class="card-body">
-        <h5 class="card-title"><xsl:value-of select="@name"/></h5>
-        <h6 class="card-subtitle mb-2 text-muted">
-          <!-- toms 2018-05-11: Not sure about the &nbsp; after "Namensraum" -->
-          Namensraum:<xsl:text disable-output-escaping="yes"><![CDATA[&nbsp;]]></xsl:text>
-          <xsl:choose>
-            <xsl:when test="boolean(namespace/text())">
-              <xsl:value-of select="namespace"/>
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:value-of select="$na"/>
-            </xsl:otherwise>
-          </xsl:choose>
-        </h6>
-        <p class="card-text"><xsl:value-of select="description"/></p>
-        <div class="svg">
-          <xsl:apply-templates select="s:svg"/>
-        </div>
-        <ul class="list-group list-group-flush">
-          <li class="list-group-item">
-            <span class="lead">Vaterelemente:</span>
-            <!-- toms 2018-05-11:
-              Hmn, this could be done by xsl:key and the key() function...
-              Sketching an idea (not sure if this works):
-              <xsl:key name="parents" match="child" use="@id"/>
-              ...
-              key('id', $id)/parent::element
-            -->
-            <xsl:variable name="parents" select="//element/child[@id = $id]/parent::element"/>
-            <xsl:choose>
-              <xsl:when test="$parents">
-                <xsl:text disable-output-escaping="yes"><![CDATA[&nbsp;]]></xsl:text>
-                <xsl:apply-templates select="$parents" mode="parent"/>
-              </xsl:when>
-              <xsl:otherwise>
-                <xsl:value-of select="$na"/>
-              </xsl:otherwise>
-            </xsl:choose>
-          </li>
-        </ul>
-        <ul class="list-group list-group-flush">
-          <li class="list-group-item">
-            <span class="lead">Kindelemente:</span>
-              <xsl:choose>
-                <xsl:when test="child">
-                  <xsl:text disable-output-escaping="yes"><![CDATA[&nbsp;]]></xsl:text>
-                  <xsl:apply-templates select="child"/>
-                </xsl:when>
-                <xsl:otherwise>
-                  <xsl:value-of select="$na"/>
-                </xsl:otherwise>
-              </xsl:choose>
-          </li>
-        </ul>
-        <br/>
-        <h5 class="card-title">Attribute</h5>
-        <!-- toms 2018-05-11: Shouldn't the <hr/> be done by CSS? -->
-        <hr/>
-        <div class="card-columns">
-          <xsl:choose>
-            <xsl:when test="attribute">
-              <xsl:apply-templates select="attribute"/>
-            </xsl:when>
-            <xsl:otherwise>
-              <p>Dieses Element hat keine Attribute</p>
-            </xsl:otherwise>
-          </xsl:choose>
-        </div>
-      </div>
-    </div>
-    <div class="toTop"><a href="#index"> [ top ] </a></div>
+    <exsl:document href="{$basedir}/elements/element_{@id}.html"
+                   method="html">
+      <html lang="en">
+        <xsl:call-template name="head"/>
+        <body>
+          <xsl:call-template name="nav"/>
+          <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="../{$filename}">Home</a></li>
+            <li class="breadcrumb-item active"><xsl:value-of select="@name"/></li>
+          </ol>
+          <div class="container">
+            <div class="card-columns">
+
+              <xsl:variable name="id" select="@id"/> 
+              <div class="card" id="element{$id}" name="element{$id}">
+                <div class="card-header">Element</div>
+                <div class="card-body">
+                  <h5 class="card-title"><xsl:value-of select="@name"/></h5>
+                  <h6 class="card-subtitle mb-2 text-muted">
+                    <!-- toms 2018-05-11: Not sure about the &nbsp; after "Namensraum" -->
+                    Namensraum:<xsl:text disable-output-escaping="yes"><![CDATA[&nbsp;]]></xsl:text>
+                    <xsl:choose>
+                      <xsl:when test="boolean(namespace/text())">
+                        <xsl:value-of select="namespace"/>
+                      </xsl:when>
+                      <xsl:otherwise>
+                        <xsl:value-of select="$na"/>
+                      </xsl:otherwise>
+                    </xsl:choose>
+                  </h6>
+                  <p class="card-text"><xsl:value-of select="description"/></p>
+                  <div class="graphviz-svg">
+                    <xsl:apply-templates select="s:svg"/>
+                  </div>
+                  <ul class="list-group list-group-flush">
+                    <li class="list-group-item">
+                      <span class="lead">Vaterelemente:</span>
+                      <!-- toms 2018-05-11:
+                        Hmn, this could be done by xsl:key and the key() function...
+                        Sketching an idea (not sure if this works):
+                        <xsl:key name="parents" match="child" use="@id"/>
+                        ...
+                        key('id', $id)/parent::element
+                      -->
+                      <xsl:variable name="parents" select="//element/child[@id = $id]/parent::element"/>
+                      <xsl:choose>
+                        <xsl:when test="$parents">
+                          <xsl:text disable-output-escaping="yes"><![CDATA[&nbsp;]]></xsl:text>
+                          <xsl:apply-templates select="$parents" mode="parent"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                          <xsl:value-of select="$na"/>
+                        </xsl:otherwise>
+                      </xsl:choose>
+                    </li>
+                  </ul>
+                  <ul class="list-group list-group-flush">
+                    <li class="list-group-item">
+                      <span class="lead">Kindelemente:</span>
+                        <xsl:choose>
+                          <xsl:when test="child">
+                            <xsl:text disable-output-escaping="yes"><![CDATA[&nbsp;]]></xsl:text>
+                            <xsl:apply-templates select="child"/>
+                          </xsl:when>
+                          <xsl:otherwise>
+                            <xsl:value-of select="$na"/>
+                          </xsl:otherwise>
+                        </xsl:choose>
+                    </li>
+                  </ul>
+                  <br/>
+                  <h5 class="card-title">Attribute</h5>
+                  <!-- toms 2018-05-11: Shouldn't the <hr/> be done by CSS? -->
+                  <hr/>
+                  <div class="card-columns">
+                    <xsl:choose>
+                      <xsl:when test="attribute">
+                        <xsl:apply-templates select="attribute"/>
+                      </xsl:when>
+                      <xsl:otherwise>
+                        <p>Dieses Element hat keine Attribute</p>
+                      </xsl:otherwise>
+                    </xsl:choose>
+                  </div>
+                </div>
+              </div>
+              <div class="toTop"><a href="#element{$id}"> [ top ] </a></div>
+
+            </div>
+          </div>
+          <xsl:call-template name="footer"/>
+          <xsl:call-template name="scripts"/>
+        </body>
+      </html>
+    </exsl:document>  
   </xsl:template>
 
   <xsl:template match="element" mode="parent">
-    <a href ="#element{@id}"><xsl:value-of select="@name"/></a>
+    <a href ="element_{@id}.html"><xsl:value-of select="@name"/></a>
     <xsl:if test="position() != last()">
        <xsl:value-of select="$sep"/>
     </xsl:if>
@@ -160,7 +189,7 @@
 
   <xsl:template match="child">
     <xsl:variable name="id" select="@id"/> 
-    <a href="#element{@id}"><xsl:value-of select="//element[@id = $id]/@name"/></a>
+    <a href="element_{@id}.html"><xsl:value-of select="//element[@id = $id]/@name"/></a>
     <xsl:if test="position() != last()">
        <xsl:value-of select="$sep"/>
     </xsl:if>
@@ -169,7 +198,7 @@
   <xsl:template match="attribute">
     <div class="card">
       <div class="card-body">
-        <h6 class="card-title"><xsl:value-of select="name"/><span class="badge badge-secondary"><xsl:value-of select="use"/></span></h6>
+        <h6 class="card-title"><xsl:value-of select="@name"/><span class="badge badge-secondary"><xsl:value-of select="use"/></span></h6>
         <h6 class="card-subtitle mb-2 text-muted">
           Namensraum:<xsl:text disable-output-escaping="yes"><![CDATA[&nbsp;]]></xsl:text>
           <xsl:choose>
@@ -243,6 +272,14 @@
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="js/jquery.graphviz.js"></script>
+    <script type="text/javascript">
+        (function($){
+            $(document).ready(function () {
+                $("svg").graphviz({statusbar: true});
+            });
+        })(jQuery);
+    </script>
   </xsl:template>
 
   <xsl:template match="s:svg">
@@ -252,6 +289,7 @@
   <xsl:template name="style">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous"/>
     <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous"/>
+    <link rel="stylesheet" href="css/jquery.graphviz.css"/>
     <style>
       .footer {
         height: 60px;
@@ -264,11 +302,12 @@
           margin-bottom: 20px;
       }
 
-      .svg {
-          margin-top: 10px;
-          margin-bottom: 10px;
+      .graphviz-svg {
+          width: 100%;
+          height: 100%;
+          position: relative; 
       }
-      
+
       #index {
         margin-bottom: 40px;
       }
@@ -289,7 +328,6 @@
       .badge {
         margin-left: 3px;
       }
-
 
       @media (min-width: 576px) {
           .card-columns {
