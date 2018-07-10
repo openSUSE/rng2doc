@@ -547,7 +547,7 @@ def visualize(node, graph, simple=True, parent=None, counter=0):
            child.tag != RNG_REF):
             counter += 1
             counter, graph = visualize(
-                child, graph, parent=parent, counter=counter)
+                child, graph, parent=parent, counter=counter, simple=simple)
         elif(child.tag == RNG_DEFINE.text or
              child.tag == A_DOC.text or
              child.tag == DB_PARA.text or
@@ -567,13 +567,13 @@ def visualize(node, graph, simple=True, parent=None, counter=0):
             # http://robertyu.com/wikiperdido/Pydot%20Clusters
             counter += 1
             counter, graph = visualize(
-                child, graph, parent=parent, counter=counter)
+                child, graph, parent=parent, counter=counter, simple=simple)
         elif child.tag == RNG_REF.text:
             xpath = "//rng:define[@name = '{}']".format(child.get("name"))
             define = node.xpath(xpath, namespaces=NSMAP).pop()
             counter += 1
             counter, graph = visualize(
-                define, graph, parent=parent, counter=counter)
+                define, graph, parent=parent, counter=counter, simple=simple)
         else:
             # Iterate through all the elements in the tree and transform the
             # tag to a visual graph node.
@@ -590,7 +590,7 @@ def visualize(node, graph, simple=True, parent=None, counter=0):
             # That the identifier of the current node as parent
             # and the child as current node.
             counter, graph = visualize(
-                child, graph, parent=identifier, counter=counter)
+                child, graph, parent=identifier, counter=counter, simple=simple)
     return counter, graph
 
 
@@ -620,8 +620,10 @@ def transform_element(element, tree):
     transformed_element = find_attributes(element, transformed_element, tree)
     graph = graphviz.Graph(format="svg")
     graph.graph_attr["rankdir"] = "LR"
-    _, graph = visualize(element, graph)
+    _, graph = visualize(element, graph, simple=False)
     svg = etree.fromstring(graph.pipe())
+    svg.attrib.pop("width")
+    svg.attrib.pop("height")
     transformed_element.append(svg)
     return transformed_element
 
