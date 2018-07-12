@@ -89,6 +89,9 @@ def transform(node, output, **kwargs):
                 parent=transformed_node, optional=optional, choice=choice,
                 template=template)
 
+        if optional:
+            optional = None
+
     return output, index
 
 

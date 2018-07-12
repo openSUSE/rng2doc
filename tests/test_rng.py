@@ -240,6 +240,50 @@ def test_transform_attribute(xml, expected):
      ]
     ),
     ("""<element name="root" xmlns="http://relaxng.org/ns/structure/1.0">
+          <optional>
+            <attribute name="test"><text/></attribute>
+          </optional>
+          <attribute name="test2"><text/></attribute>
+          <optional>
+            <attribute name="test3"><text/></attribute>
+          </optional>
+        </element>""",
+     # The expected result looks like:
+     # -------------------------------
+     # <documentation>
+     #   <element name="root">
+     #     <namespace/>
+     #     <attribute name="test">
+     #       <namespace/>
+     #       <type name="text"/>
+     #       <use>optional</use>
+     #     </attribute>
+     #     <attribute name="test2">
+     #       <namespace/>
+     #       <type name="text"/>
+     #       <use>required</use>
+     #     </attribute>
+     #     <attribute name="test3">
+     #       <namespace/>
+     #       <type name="text"/>
+     #       <use>optional</use>
+     #     </attribute>
+     #   </element>
+     # </documentation>
+     [
+         ("local-name(/*)", "documentation"),
+         ("count(/documentation/element[@name = 'root']/attribute)", 3),
+         ("boolean(/documentation/element[@name = 'root']/attribute[@name = 'test'])",
+           True),
+         ("/documentation/element[@name = 'root']/attribute[@name = 'test']/use/text()",
+          ["optional"]),
+         ("/documentation/element[@name = 'root']/attribute[@name = 'test2']/use/text()",
+          ["required"]),
+         ("/documentation/element[@name = 'root']/attribute[@name = 'test3']/use/text()",
+          ["optional"]),
+     ]
+    ),
+    ("""<element name="root" xmlns="http://relaxng.org/ns/structure/1.0">
           <attribute name="test"><text/></attribute>
         </element>""",
      # The expected result looks like:
