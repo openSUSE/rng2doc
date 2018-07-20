@@ -2,6 +2,9 @@
 rng2doc 0.2.3
 =============
 
+.. image:: https://travis-ci.org/openSUSE/rng2doc.svg?branch=develop
+    :target: https://travis-ci.org/openSUSE/rng2doc
+
 Converts a RELAX NG schema into documentation (HTML).
 
 * Free software: MIT license
@@ -16,36 +19,3 @@ in a virtual environment::
     $ source .env/bin/activate
     $ pip install -r requirements.txt
     $ pip install rng2doc
-
-
-Development
-===========
-
-To run the all tests run::
-
-    $ tox
-
-To show the available target, run::
-
-    $ tox -l
-
-To run a code stylecheck (``flake8``), run::
-
-    $ tox -e check
-
-Note, to combine the coverage data from all the tox environments run:
-
-.. list-table::
-    :widths: 10 90
-    :stub-columns: 1
-
-    - - Windows
-      - ::
-
-            set PYTEST_ADDOPTS=--cov-append
-            tox
-
-    - - Other
-      - ::
-
-            PYTEST_ADDOPTS=--cov-append tox
