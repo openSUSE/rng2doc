@@ -1,4 +1,6 @@
 language: python
+# Ubuntu version
+dist: xenial
 sudo: false
 cache: pip
 env:
@@ -30,6 +32,7 @@ before_install:
   - lsb_release -a
 
 install:
+  - sudo apt-get update && apt-get install -y graphviz
   - pip install tox
   - virtualenv --version
   - easy_install --version
@@ -42,6 +45,11 @@ script:
 after_failure:
   - more .tox/log/* | cat
   - more .tox/*/log/* | cat
+
+# blacklist
+branches:
+    except:
+        - gh-pages
 
 notifications:
   email:
