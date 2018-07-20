@@ -24,13 +24,34 @@
   extension-element-prefixes="exsl">
   <xsl:output method="html" doctype-system="about:legacy-compat" encoding="utf-8" indent="yes" />
 
+  <xsl:key name="elementname" match="element" use="@name"/>
+  <xsl:key name="child" match="element/child" use="@id"/>
+
   <!-- === Parameters -->
   <xsl:param name="na"><xsl:text>-</xsl:text></xsl:param>
   <xsl:param name="sep"><xsl:text>, </xsl:text></xsl:param>
   <xsl:param name="basedir" select="'html'"/>
   <xsl:param name="filename"/>
+  <xsl:param name="ghprj">https://github.com/openSUSE/rng2doc</xsl:param>
 
   <xsl:key name="first_letters" match="element" use="substring(@name, 1, 1)"/>
+
+ <!-- === Named Templates -->
+ <xsl:template name="create-filename">
+  <xsl:param name="node" select="."/>
+  <xsl:variable name="name" select="translate($node/@name, ':', '_')"/>
+
+  <xsl:choose>
+   <xsl:when test="count(key('elementname', $name)) = 1">
+    <xsl:value-of select="$name"/>
+   </xsl:when>
+   <xsl:otherwise>
+    <xsl:value-of select="concat($name, '-', $node/@id)"/>
+   </xsl:otherwise>
+  </xsl:choose>
+ </xsl:template>
+
+  <!-- === Templates -->
   <xsl:template match="documentation">
     <html lang="en">
       <xsl:call-template name="head"/>
@@ -73,7 +94,10 @@
   </xsl:template>
 
   <xsl:template match="element" mode="index">
-    <li class="list-group-item"><a href="elements/element_{@id}.html"><code><xsl:value-of select="@name"/></code></a></li>
+   <xsl:variable name="ename">
+    <xsl:call-template name="create-filename"/>
+   </xsl:variable>
+    <li class="list-group-item"><a href="elements/{$ename}.html"><code><xsl:value-of select="@name"/></code></a></li>
   </xsl:template>  
 
   <xsl:template match="element" mode="visualize">
@@ -83,7 +107,10 @@
       cases for namespace, parent elements, child elements etc.
       In this rule you call the other parts.
     -->
-    <exsl:document href="{$basedir}/elements/element_{@id}.html"
+   <xsl:variable name="ename">
+    <xsl:call-template name="create-filename"/>
+   </xsl:variable>
+    <exsl:document href="{$basedir}/elements/{$ename}.html"
                    method="html">
       <html lang="en">
         <xsl:call-template name="head"/>
@@ -181,15 +208,22 @@
   </xsl:template>
 
   <xsl:template match="element" mode="parent">
-    <a href ="element_{@id}.html"><xsl:value-of select="@name"/></a>
+   <xsl:variable name="name" select="translate(@name, ':', '_')"/>
+   <xsl:variable name="ename">
+    <xsl:call-template name="create-filename"/>
+   </xsl:variable>
+    <a href ="{$ename}.html"><xsl:value-of select="@name"/></a>
     <xsl:if test="position() != last()">
        <xsl:value-of select="$sep"/>
     </xsl:if>
   </xsl:template>
 
   <xsl:template match="child">
+   <xsl:variable name="ename">
+    <xsl:call-template name="create-filename"/>
+   </xsl:variable>
     <xsl:variable name="id" select="@id"/> 
-    <a href="element_{@id}.html"><xsl:value-of select="//element[@id = $id]/@name"/></a>
+    <a href="{$ename}.html"><xsl:value-of select="//element[@id = $id]/@name"/></a>
     <xsl:if test="position() != last()">
        <xsl:value-of select="$sep"/>
     </xsl:if>
@@ -263,7 +297,7 @@
   <xsl:template name="footer">
     <footer class="footer">
       <div class="text-center" lang="en">
-        Created with <i class="fa fa-heart secondary-colour"><xsl:text disable-output-escaping="yes"><![CDATA[&nbsp;]]></xsl:text></i> by jloehel for the SUSE documentation team
+        Created with <i class="fa fa-heart secondary-colour"><xsl:text disable-output-escaping="yes"><![CDATA[&nbsp;]]></xsl:text></i> by jloehel for the SUSE documentation team. <i class="fa fa-github"><a href="{$ghprj}"><xsl:value-of select="$ghprj"/></a></i>
       </div>
     </footer>
   </xsl:template>
