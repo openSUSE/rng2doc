@@ -41,7 +41,7 @@
         </ol>
         <div class="container">
           <div id="index">
-            <h1>Elemente</h1>
+            <h1>Elements</h1>
             <xsl:for-each select="element[count(. | key('first_letters', substring(@name, 1, 1))[1]) = 1]">
                 <xsl:sort select="@name" />
                 <xsl:variable name="counter_hack" select="position() - 1"/>
@@ -119,7 +119,7 @@
                   </div>
                   <ul class="list-group list-group-flush">
                     <li class="list-group-item">
-                      <span class="lead">Vaterelemente:</span>
+                      <span class="lead">Parent Elements:</span>
                       <!-- toms 2018-05-11:
                         Hmn, this could be done by xsl:key and the key() function...
                         Sketching an idea (not sure if this works):
@@ -141,7 +141,7 @@
                   </ul>
                   <ul class="list-group list-group-flush">
                     <li class="list-group-item">
-                      <span class="lead">Kindelemente:</span>
+                      <span class="lead">Child Elements:</span>
                         <xsl:choose>
                           <xsl:when test="child">
                             <xsl:text disable-output-escaping="yes"><![CDATA[&nbsp;]]></xsl:text>
@@ -154,7 +154,7 @@
                     </li>
                   </ul>
                   <br/>
-                  <h5 class="card-title">Attribute</h5>
+                  <h5 class="card-title">Attributs</h5>
                   <!-- toms 2018-05-11: Shouldn't the <hr/> be done by CSS? -->
                   <hr/>
                   <div class="card-columns">
@@ -163,7 +163,7 @@
                         <xsl:apply-templates select="attribute"/>
                       </xsl:when>
                       <xsl:otherwise>
-                        <p>Dieses Element hat keine Attribute</p>
+                        <p>This element contains no attributes.</p>
                       </xsl:otherwise>
                     </xsl:choose>
                   </div>
@@ -200,7 +200,7 @@
       <div class="card-body">
         <h6 class="card-title"><xsl:value-of select="@name"/><span class="badge badge-secondary"><xsl:value-of select="use"/></span></h6>
         <h6 class="card-subtitle mb-2 text-muted">
-          Namensraum:<xsl:text disable-output-escaping="yes"><![CDATA[&nbsp;]]></xsl:text>
+          Namenspace:<xsl:text disable-output-escaping="yes"><![CDATA[&nbsp;]]></xsl:text>
           <xsl:choose>
             <xsl:when test="boolean(namespace/text())">
               <xsl:value-of select="namespace"/>
@@ -248,7 +248,7 @@
       <meta name="description" content=""/>
       <meta name="viewport" content="width=device-width, initial-scale=1"/>
       <xsl:call-template name="style"/>
-      <title>RELAX-NG Schema documentation</title>
+      <title>RELAX-NG Schema Documentation</title>
     </head>
   </xsl:template>
 
