@@ -1,46 +1,67 @@
+# config file for automatic testing at travis-ci.org
+
 language: python
 # Ubuntu version
 dist: xenial
-sudo: false
+
 cache: pip
+
 env:
-  global:
-    - LD_PRELOAD=/lib/x86_64-linux-gnu/libSegFault.so
-    - SEGFAULT_SIGNALS=all
-  matrix:
-    - TOXENV=check
-    - TOXENV=docs
+    global:
+        - LD_PRELOAD=/lib/x86_64-linux-gnu/libSegFault.so
+        #- SEGFAULT_SIGNALS=all
 
-matrix:
-  include:
-    - python: '3.4'
-      env:
-        - TOXENV=py34,report,coveralls
-    - python: '3.5'
-      env:
-        - TOXENV=py35,report,coveralls
-    - python: '3.6'
-      env:
-        - TOXENV=py36,report,coveralls
-    - python: 'pypy-5.4'
-      env:
-        - TOXENV=pypy,report,coveralls
+stages:
+    # - check
+    - test
+    # - doc
 
-before_install:
-  - python --version
-  - uname -a
-  - lsb_release -a
+jobs:
+    include:
+        #- stage: check
+        #  python: 3.4
+        #  env: TOXENV=check
+        #  install: skip
+        #  script: tox -v
+        - stage: test
+          python: 3.4
+          env: TOXENV=py34
+        - stage: test
+          python: 3.5
+          env: TOXENV=py35
+        - stage: test
+          python: 3.6
+          env: TOXENV=py36
+        #- stage: doc
+        #  python: 3.6
+        #  script: travis-sphinx --nowarn --source=doc build
 
+
+# command to install dependencies
 install:
-  - sudo apt-get update && sudo apt-get install -y graphviz
-  - pip install tox
-  - virtualenv --version
-  - easy_install --version
-  - pip --version
-  - tox --version
+    - sudo apt-get update && sudo apt-get install -y graphviz
+    - pip install -U pip setuptools
+    - pip install .
+    - pip install -r travis-requirements.pip
 
+before_script:
+    - python3 --version
+    - uname -a
+    - lsb_release -a
+    - virtualenv --version
+    - easy_install --version
+    - pip --version
+    - pip install tox
+    - tox --version
+    - pip list
+
+# command to run tests
 script:
-  - tox -v
+    - tox -v
+
+#addons:
+#    code_climate:
+#        repo_token: $CODECLIMATE_REPO_TOKEN
 
 after_failure:
   - more .tox/log/* | cat
