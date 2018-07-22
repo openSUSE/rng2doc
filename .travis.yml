@@ -12,17 +12,17 @@ env:
         #- SEGFAULT_SIGNALS=all
 
 stages:
-    # - check
+    - check
     - test
     # - doc
 
 jobs:
     include:
-        #- stage: check
-        #  python: 3.4
-        #  env: TOXENV=check
-        #  install: skip
-        #  script: tox -v
+        - stage: check
+          python: 3.4
+          env: TOXENV=check
+          install: skip
+          script: tox -v
         - stage: test
           python: 3.4
           env: TOXENV=py34
@@ -32,6 +32,9 @@ jobs:
         - stage: test
           python: 3.6
           env: TOXENV=py36
+        - stage: test
+          python: nightly
+          env: TOXENV=py37
         #- stage: doc
         #  python: 3.6
         #  script: travis-sphinx --nowarn --source=doc build
