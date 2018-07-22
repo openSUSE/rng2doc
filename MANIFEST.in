@@ -40,13 +40,11 @@ include .idea/vcs.xml
 # include .idea/sdsc.iml
 
 # Exclude some specific files
-exclude bitbucket-pipelines.yml
-
-# REMOVE NONSENSE
-prune ci
+exclude tests/internal.rng
 
 # Configuration files for automated testing & git repo maintenance
-global-exclude .cookiecutterrc .coveragerc .coverage .travis.yml .versionrc versionbump
+global-exclude bitbucket-pipelines.yml .cookiecutterrc .coveragerc .coverage .travis.yml .versionrc versionbump
+
 
 # Temporary files
 global-exclude *.py[cod] __pycache__ *.so *.dylib *~ *.bak *.gitignore *.doap
