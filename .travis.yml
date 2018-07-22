@@ -49,6 +49,7 @@ install:
 
 before_script:
     - python3 --version
+    - ls -l /usr/bin/python{2,3}*
     - uname -a
     - lsb_release -a
     - virtualenv --version
