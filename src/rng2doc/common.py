@@ -64,9 +64,9 @@ NSMAP = dict(a="http://relaxng.org/ns/compatibility/annotations/1.0",
              db="http://docbook.org/ns/docbook",
              html="http://www.w3.org/1999/xhtml",
              rng="http://relaxng.org/ns/structure/1.0",
-             s="http://purl.oclc.org/dsdl/schematron",
              xlink="http://www.w3.org/1999/xlink",
              sch="http://purl.oclc.org/dsdl/schematron",
+             xml="http://www.w3.org/XML/1998/namespace",
              )
 
 # Relax NG namespace
@@ -105,6 +105,10 @@ SCH_PARAM = QName(NSMAP['sch'], "param")
 SCH_RULE = QName(NSMAP['sch'], "rule")
 
 A_DOC = QName(NSMAP['a'], "documentation")
+
+#: Stylesheets
+HTML_XSLT = "xslt/html.xslt"
+
 
 #: Map verbosity to log levels
 LOGLEVELS = {None: WARNING,  # 0
