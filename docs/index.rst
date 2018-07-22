@@ -9,6 +9,7 @@ Documentation of rng2doc
    installation
    usage
    reference/index
+   rng2doc
    contributing
    authors
    changelog
