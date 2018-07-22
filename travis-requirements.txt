@@ -1,0 +1,6 @@
+# Requirements file for pip (only for Travis CI)
+
+-r devel-requirements.txt
+
+# See https://github.com/Syntaf/travis-sphinx/pull/5
+# travis-sphinx==1.2.0
