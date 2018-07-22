@@ -2,7 +2,7 @@
 
 language: python
 # Ubuntu version
-dist: xenial
+# dist: xenial
 
 cache: pip
 
