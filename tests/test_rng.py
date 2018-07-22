@@ -122,9 +122,13 @@ def test_parse(mock_parse):
          ("boolean(/documentation/element[@name = 'root']/child[@id = '2'])", True),
          ("boolean(/documentation/element[@name = 'test1'])", True),
          ("boolean(/documentation/element[@name = 'test2'])", True),
-     ]
-    )
-])
+     ],
+    )],
+    ids=['E.test',
+         'G.start.test',
+         'E.root.test',
+         'E.root.(test1,test2)'],
+)
 def test_transform_element(xml, expected):
     result = parse(io.StringIO(xml))
     assert isinstance(result, etree._ElementTree)
@@ -203,9 +207,11 @@ def test_transform_element(xml, expected):
            True),
          ("boolean(/documentation/element[@name = 'element1']/attribute[@name = 'test3'])",
            True),
-     ]
-    ),
-])
+     ])
+    ],
+    ids=['E.root.@test',
+         'E.root.(@test1,@test2).element1'],
+)
 def test_transform_attribute(xml, expected):
     result = parse(io.StringIO(xml))
     assert isinstance(result, etree._ElementTree)
@@ -306,8 +312,11 @@ def test_transform_attribute(xml, expected):
          ("/documentation/element[@name = 'root']/attribute[1]/use/text()",
           ["required"]),
      ]
-    ),
-])
+    )],
+    ids=['E.root.@test?',
+         'E.root.(@test?,@test2,@test3?)',
+         'E.root.@test'],
+)
 def test_transform_optional(xml, expected):
     result = parse(io.StringIO(xml))
     assert isinstance(result, etree._ElementTree)
@@ -347,8 +356,9 @@ def test_transform_optional(xml, expected):
          ("/documentation/element[@name = 'root']/attribute/description/text()",
           ["This is a test attribute."]),
      ]
-    ),
-])
+    )],
+    ids=['E.a:doc'],
+)
 def test_transform_annotations(xml, expected):
     result = parse(io.StringIO(xml))
     assert isinstance(result, etree._ElementTree)
@@ -435,8 +445,11 @@ def test_transform_annotations(xml, expected):
          ("/documentation/element[@name = 'root']/attribute/type/description/text()",
           ["This is a test datatype"]),
      ]
-    ),
-])
+    )],
+    ids=['E.root.@test.data.string',
+         'E.root.@test.data.token.pattern',
+         'E.root.@test.data.token']
+)
 def test_transform_datatype(xml, expected):
     result = parse(io.StringIO(xml))
     assert isinstance(result, etree._ElementTree)
@@ -496,10 +509,9 @@ def test_transform_datatype(xml, expected):
            True),
          ("boolean(/documentation/element[@name = 'test2']/attribute[@name = 'test_attribute2'])",
            True),
-     ]
-
-    ),
-])
+     ])],
+    ids=['G.ref.test2.attlist'],
+)
 def test_transform_references(xml, expected):
     result = parse(io.StringIO(xml))
     assert isinstance(result, etree._ElementTree)
@@ -610,8 +622,10 @@ def test_transform_references(xml, expected):
          ("/documentation/element[@name = 'test2']/attribute[1]/type/value[@name = 'value2']/description/text()",
            ["A test value2"]),
      ]
-    ),
-])
+    )],
+    ids=['G.enum.without-docs',
+         'G.enum.with-docs'],
+)
 def test_transform_enumerations(xml, expected):
     result = parse(io.StringIO(xml))
     assert isinstance(result, etree._ElementTree)
@@ -659,7 +673,9 @@ def test_transform_enumerations(xml, expected):
           True),
      ]
     ),
-])
+    ],
+    ids=['G.anyElement'],
+)
 def test_transform_name_classes(xml, expected):
     result = parse(io.StringIO(xml))
     assert isinstance(result, etree._ElementTree)
@@ -888,9 +904,11 @@ def test_transform_name_classes(xml, expected):
          ("/documentation/element[@name = 'trans:test']/attribute/namespace/text()",
           []),
      ]
-    ),
-
-])
+    )],
+    ids=['G.E.test1', 'G.E.test2', 'G.E.test3', 'G.E.test4',
+         'G.E.test5', 'G.E.test6', 'G.E.test7',
+         ],
+)
 def test_transform_namespaces(xml, expected):
     result = parse(io.StringIO(xml))
     assert isinstance(result, etree._ElementTree)
