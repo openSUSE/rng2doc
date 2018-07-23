@@ -25,7 +25,8 @@
   <xsl:output method="html" doctype-system="about:legacy-compat" encoding="utf-8" indent="yes" />
 
   <xsl:key name="elementname" match="element" use="@name"/>
-  <xsl:key name="child" match="element/child" use="@id"/>
+  <xsl:key name="elementid" match="element" use="@id"/>
+  <xsl:key name="child" match="child" use="@id"/>
 
   <!-- === Parameters -->
   <xsl:param name="na"><xsl:text>-</xsl:text></xsl:param>
@@ -219,11 +220,14 @@
   </xsl:template>
 
   <xsl:template match="child">
+   <xsl:variable name="enode" select="key('elementid', @id)"/>
    <xsl:variable name="ename">
-    <xsl:call-template name="create-filename"/>
+    <xsl:call-template name="create-filename">
+     <xsl:with-param name="node" select="$enode"/>
+    </xsl:call-template>
    </xsl:variable>
     <xsl:variable name="id" select="@id"/> 
-    <a href="{$ename}.html"><xsl:value-of select="//element[@id = $id]/@name"/></a>
+    <a href="{$ename}.html"><xsl:value-of select="$enode/@name"/></a>
     <xsl:if test="position() != last()">
        <xsl:value-of select="$sep"/>
     </xsl:if>
