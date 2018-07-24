@@ -17,8 +17,7 @@ from ..common import (A_DOC,
                       RNG_OPTIONAL,
                       RNG_PARAM,
                       RNG_TEXT,
-                      RNG_VALUE,
-                      )
+                      RNG_VALUE)
 
 LOG = logging.getLogger(__name__)
 
