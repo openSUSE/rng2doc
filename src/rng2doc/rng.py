@@ -103,11 +103,9 @@ def add_unique_index(elements):
     :return: The same list of etree.Elements with a unique index.
     :rtype: A list of etree.Element
     """
-    index = 0
-    for element in elements:
+    for index, element in enumerate(elements):
         uuid = "{}".format(index)
         element.attrib["id"] = uuid
-        index += 1
     return elements
 
 

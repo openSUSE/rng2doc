@@ -9,6 +9,7 @@ from lxml import etree
 
 # Local imports
 from ..common import (A_DOC,
+                      NSMAP,
                       RNG_ATTRIBUTE,
                       RNG_CHOICE,
                       RNG_DATA,
@@ -30,7 +31,7 @@ def find_namespace(node):
         if prefix in node.nsmap:
             return node.nsmap[prefix]
         elif prefix == "xml":
-            return "http://www.w3.org/XML/1998/namespace"
+            return NSMAP['xml']
     namespace = node.get("ns")
     if namespace:
         return namespace
