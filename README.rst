@@ -17,5 +17,6 @@ in a virtual environment::
 
     $ python3 -m venv .env
     $ source .env/bin/activate
+    $ pip install -U pip setuptools
     $ pip install -r requirements.txt
-    $ pip install rng2doc
+    $ pip install -e .
