@@ -1,5 +1,5 @@
 =============
-rng2doc 0.2.3
+rng2doc 0.3.0
 =============
 
 .. image:: https://travis-ci.org/openSUSE/rng2doc.svg?branch=develop

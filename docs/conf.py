@@ -31,7 +31,7 @@ project = 'rng2doc'
 year = '2017'
 author = 'Thomas Schraitle'
 copyright = '{0}, {1}'.format(year, author)
-version = release = '0.2.3'
+version = release = '0.3.0'
 
 autosummary_generate = True
 
