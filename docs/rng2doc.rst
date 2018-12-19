@@ -47,6 +47,10 @@ Options
 
    Increase verbosity (can be repeated).
 
+.. option:: --timing
+
+   Output timing data to standard error.
+
 .. option:: --output=<OUTFILE>
 
    Optional file where results are written to
