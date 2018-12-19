@@ -7,7 +7,7 @@ pytest-cov
 tox
 isort
 flake8
-bumpversion
+bump2version
 #
 coverage
 codecov
