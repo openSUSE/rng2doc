@@ -11,6 +11,10 @@ Options:
     -h, --help        Shows this help
     -v                Raise verbosity level
     --version         Prints the version
+    --timing          Output timing data to standard error
+                      perf:  It does include time elapsed during sleep and is
+                             system-wide.
+                      proc:  It does not include time elapsed during sleep.
     --output=<OUTFILE>, -o <OUTFILE>
                       Optional file where results are written to
     --output-format=<FORMAT>, -f <FORMAT>
@@ -21,6 +25,7 @@ Options:
 import logging
 import os
 import sys
+import time
 from logging.config import dictConfig
 
 # Third Party Libraries
@@ -108,12 +113,21 @@ def main(cliargs=None):
     """
     try:
         args = parsecli(cliargs)
+        if args['--timing']:
+            t_perf = time.perf_counter()
+            t_proc = time.process_time()
         LOG.info('%s version: %s', __package__, __version__)
         LOG.debug('Python version: %s', sys.version.split()[0])
         LOG.debug("CLI result: %s", args)
         checkargs(args)
         result = parse(args['RNGFILE'])
         output(result, args['--output'], args["--output-format"])
+        if args['--timing']:
+            elapsed_time_perf = time.perf_counter() - t_perf
+            elapsed_time_proc = time.process_time() - t_proc
+            timing_msg = "{:7} (timing): {} perf, {} proc"
+            timing_msg = timing_msg.format(__package__, elapsed_time_perf, elapsed_time_proc)
+            print(timing_msg, file=sys.stderr)
         LOG.info("Done.")
         return 0
 
