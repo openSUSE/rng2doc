@@ -130,8 +130,8 @@
                 <div class="card-body">
                   <h5 class="card-title"><xsl:value-of select="@name"/></h5>
                   <h6 class="card-subtitle mb-2 text-muted">
-                    <!-- toms 2018-05-11: Not sure about the &nbsp; after "Namensraum" -->
-                    Namensraum:<xsl:text disable-output-escaping="yes"><![CDATA[&nbsp;]]></xsl:text>
+                    <!-- toms 2018-05-11: Not sure about the &nbsp; after "Namespace" -->
+                    Namespace:<xsl:text disable-output-escaping="yes"><![CDATA[&nbsp;]]></xsl:text>
                     <xsl:choose>
                       <xsl:when test="boolean(namespace/text())">
                         <xsl:value-of select="namespace"/>
@@ -182,7 +182,7 @@
                     </li>
                   </ul>
                   <br/>
-                  <h5 class="card-title">Attributs</h5>
+                  <h5 class="card-title">Attributes</h5>
                   <!-- toms 2018-05-11: Shouldn't the <hr/> be done by CSS? -->
                   <hr/>
                   <div class="card-columns">
@@ -191,7 +191,7 @@
                         <xsl:apply-templates select="attribute"/>
                       </xsl:when>
                       <xsl:otherwise>
-                        <p>This element contains no attributes.</p>
+                        <p>This element has no attributes.</p>
                       </xsl:otherwise>
                     </xsl:choose>
                   </div>
@@ -238,7 +238,7 @@
       <div class="card-body">
         <h6 class="card-title"><xsl:value-of select="@name"/><span class="badge badge-secondary"><xsl:value-of select="use"/></span></h6>
         <h6 class="card-subtitle mb-2 text-muted">
-          Namenspace:<xsl:text disable-output-escaping="yes"><![CDATA[&nbsp;]]></xsl:text>
+          Namespace:<xsl:text disable-output-escaping="yes"><![CDATA[&nbsp;]]></xsl:text>
           <xsl:choose>
             <xsl:when test="boolean(namespace/text())">
               <xsl:value-of select="namespace"/>
@@ -253,7 +253,7 @@
         <table class="table table-bordered">
           <tbody>
             <tr class="d-flex">
-              <th scope="row" class="col-sm-2">Datentyp</th>
+              <th scope="row" class="col-sm-2">Data type</th>
               <xsl:choose>
                 <xsl:when test="type/@name">
                   <td class="col-sm-10"><xsl:value-of select="type/@name"/></td>
@@ -264,7 +264,7 @@
               </xsl:choose>
             </tr>
             <tr class="d-flex">
-              <th scope="row" class="col-sm-2">Parameter</th>
+              <th scope="row" class="col-sm-2">Parameters</th>
               <xsl:choose>
                 <xsl:when test="type/param/@name">
                   <td class="col-sm-10"><xsl:value-of select="type/param/@name"/>: <xsl:value-of select="type/param/text()"/></td>
@@ -293,7 +293,7 @@
   <xsl:template name="nav">
     <nav class="navbar navbar-expand-md navbar-light bg-light" role="navigation">
       <div class="navbar-header">
-        <a class="navbar-brand" href="#">RELAX-NG Schema Dokumentation</a>
+        <a class="navbar-brand" href="#">RELAX-NG Schema Documentation</a>
       </div>
     </nav>
   </xsl:template>
