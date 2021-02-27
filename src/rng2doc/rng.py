@@ -3,6 +3,7 @@
 
 # Standard Library
 import logging
+import subprocess
 
 # Third Party Libraries
 import pydot
@@ -122,7 +123,10 @@ def parse(rngfile):
     # Remove all blank lines, which makes the output later much more beautiful.
     xmlparser = etree.XMLParser(remove_blank_text=True, remove_comments=True)
 
-    relaxng_schema = etree.parse("schemas/relaxng.rng")
+    path_to_schema = subprocess.check_output(
+            ["find $(echo $HOME) -name relaxng.rng"], 
+            shell=True).strip().decode('ascii')
+    relaxng_schema = etree.parse(path_to_schema)
     relaxng = etree.RelaxNG(relaxng_schema)
     rngtree = etree.parse(rngfile, xmlparser)
     if not relaxng.validate(rngtree):
