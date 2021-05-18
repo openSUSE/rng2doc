@@ -301,7 +301,7 @@
   <xsl:template name="footer">
     <footer class="footer">
       <div class="text-center" lang="en">
-        Created with <i class="fa fa-heart secondary-colour"><xsl:text disable-output-escaping="yes"><![CDATA[&nbsp;]]></xsl:text></i> by jloehel for the SUSE documentation team. <i class="fa fa-github"><a href="{$ghprj}"><xsl:value-of select="$ghprj"/></a></i>
+        Created with <a href="{$ghprj}"><xsl:value-of select="$ghprj"/></a>.
       </div>
     </footer>
   </xsl:template>
