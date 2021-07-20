@@ -3,6 +3,7 @@
 
 # Standard Library
 import logging
+from pkg_resources import resource_filename
 
 # Third Party Libraries
 import pydot
@@ -122,7 +123,7 @@ def parse(rngfile):
     # Remove all blank lines, which makes the output later much more beautiful.
     xmlparser = etree.XMLParser(remove_blank_text=True, remove_comments=True)
 
-    relaxng_schema = etree.parse("schemas/relaxng.rng")
+    relaxng_schema = etree.parse(resource_filename(__package__, "schemas/relaxng.rng"))
     relaxng = etree.RelaxNG(relaxng_schema)
     rngtree = etree.parse(rngfile, xmlparser)
     if not relaxng.validate(rngtree):

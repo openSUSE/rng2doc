@@ -27,6 +27,7 @@ import os
 import sys
 import time
 from logging.config import dictConfig
+from pkg_resources import resource_filename
 
 # Third Party Libraries
 from docopt import DocoptExit, docopt, printable_usage
@@ -92,7 +93,7 @@ def output(result, file_path, oformat):
     if oformat == "html":
         path = os.path.join(path, "html")
         os.makedirs(os.path.join(path, "elements"), exist_ok=True)
-        xslt_html = etree.parse("xslt/html.xslt")
+        xslt_html = etree.parse(resource_filename(__package__, "xslt/html.xslt"))
         transform = etree.XSLT(xslt_html)
         result = transform(
             result, basedir="'{}'".format(path),

@@ -18,6 +18,9 @@ include *.rst
 include xslt/html.xslt
 include xslt/svg.xslt
 
+# Schemas
+include schemas/relaxng.rng
+
 # Development Files & Test Suite
 include make_devsetup.sh
 include *requirements.txt
