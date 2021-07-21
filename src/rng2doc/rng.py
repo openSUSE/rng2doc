@@ -38,7 +38,7 @@ def transform(node, output, **kwargs):
         if node.tag != RNG_ELEMENT.text:
             return output
         transform_func = template.get(node.tag)
-        transformed_node = transform_func(node, root=True, index=index)
+        transformed_node = transform_func(node, root=True, index=index, **kwargs)
         append(transformed_node, output, graph=output, root=True)
         parent = transformed_node
 
@@ -134,12 +134,21 @@ def parse(rngfile):
 
     documentation = etree.Element("documentation")
 
+    already_seen = []
+
     for element in elements:
         name = element.get("name")
         if name is None:
             name = "anyName"
+        if name in already_seen:
+            dupe = True
+            previous = documentation.find(f".//element[@name='{name}']")
+            previous.attrib["dupe"] = "true"
+        else:
+            already_seen.append(name)
+            dupe = False
         element_id = element.attrib["id"]
-        documentation, _ = transform(element, documentation, template=XML)
+        documentation, _ = transform(element, documentation, template=XML, dupe=dupe)
 
         name = '"' + name + '"'
         graph = pydot.Dot(graph_name=name, rankdir="LR", format="svg")

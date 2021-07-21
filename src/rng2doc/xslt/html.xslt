@@ -26,6 +26,8 @@
 
   <xsl:key name="elementname" match="element" use="@name"/>
   <xsl:key name="elementid" match="element" use="@id"/>
+  <xsl:key name="elementdefine" match="element" use="@define"/>
+  <xsl:key name="elementdupe" match="element" use="@dupe"/>
   <xsl:key name="child" match="child" use="@id"/>
 
   <!-- === Parameters -->
@@ -75,7 +77,7 @@
                   <ul id="{$first_letter}" class="list-group">
                     <li class="list-group-item active"><xsl:value-of select="$first_letter"/></li>
                     <xsl:apply-templates select="key('first_letters', substring(@name, 1, 1))" mode="index">
-                      <xsl:sort select="@name" />
+                        <xsl:sort select="@name" />
                     </xsl:apply-templates>
                   </ul>
                 </div>
@@ -98,8 +100,17 @@
    <xsl:variable name="ename">
     <xsl:call-template name="create-filename"/>
    </xsl:variable>
-    <li class="list-group-item"><a href="elements/{$ename}.html"><code><xsl:value-of select="@name"/></code></a></li>
-  </xsl:template>  
+   <li class="list-group-item">
+     <a href="elements/{$ename}.html">
+       <code>
+        <xsl:value-of select="@name"/>
+        <xsl:if test="@define and @dupe = 'true'">
+          (<xsl:value-of select="@define"/>)
+        </xsl:if>
+       </code>
+     </a>
+   </li>
+  </xsl:template>
 
   <xsl:template match="element" mode="visualize">
     <!-- toms 2018-05-11
@@ -124,11 +135,17 @@
           <div class="container">
             <div class="card-columns">
 
-              <xsl:variable name="id" select="@id"/> 
+              <xsl:variable name="id" select="@id"/>
               <div class="card" id="element{$id}" name="element{$id}">
                 <div class="card-header">Element</div>
                 <div class="card-body">
-                  <h5 class="card-title"><xsl:value-of select="@name"/></h5>
+                    <h5 class="card-title">
+                        <xsl:value-of select="@name"/>
+                        <xsl:if test="@define and @dupe = 'true'">
+                            <xsl:text disable-output-escaping="yes"><![CDATA[&nbsp;]]></xsl:text>
+                            (<xsl:value-of select="@define"/>)
+                        </xsl:if>
+                    </h5>
                   <h6 class="card-subtitle mb-2 text-muted">
                     <!-- toms 2018-05-11: Not sure about the &nbsp; after "Namespace" -->
                     Namespace:<xsl:text disable-output-escaping="yes"><![CDATA[&nbsp;]]></xsl:text>
@@ -205,7 +222,7 @@
           <xsl:call-template name="scripts"/>
         </body>
       </html>
-    </exsl:document>  
+    </exsl:document>
   </xsl:template>
 
   <xsl:template match="element" mode="parent">
@@ -226,7 +243,7 @@
      <xsl:with-param name="node" select="$enode"/>
     </xsl:call-template>
    </xsl:variable>
-    <xsl:variable name="id" select="@id"/> 
+    <xsl:variable name="id" select="@id"/>
     <a href="{$ename}.html"><xsl:value-of select="$enode/@name"/></a>
     <xsl:if test="position() != last()">
        <xsl:value-of select="$sep"/>
@@ -343,7 +360,7 @@
       .graphviz-svg {
           width: 100%;
           height: 100%;
-          position: relative; 
+          position: relative;
       }
 
       #index {
