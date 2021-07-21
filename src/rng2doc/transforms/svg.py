@@ -1,9 +1,5 @@
 """Transform dictionary and functions for SVG
 """
-
-# Standard Library
-import logging
-
 # Third Party Libraries
 import pydot
 
@@ -25,8 +21,6 @@ from ..common import (RNG_ANY_NAME,  # A_DOC,; RNG_DEFINE,
                       RNG_TEXT,
                       RNG_VALUE,
                       RNG_ZERO_OR_MORE)
-
-LOG = logging.getLogger(__name__)
 
 
 def transform_element_svg(node, **kwargs):

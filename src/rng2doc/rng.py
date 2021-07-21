@@ -14,7 +14,7 @@ from .common import NSMAP, RNG_ELEMENT, RNG_REF, RNG_VALUE
 from .transforms.svg import SVG
 from .transforms.xml import XML
 
-LOG = logging.getLogger(__name__)
+logger = logging.getLogger(__package__)
 
 
 def transform(node, output, **kwargs):
@@ -118,7 +118,7 @@ def parse(rngfile):
      :return: The ElementTree of the new XML document
      :rtype: etree.ElementTree
     """
-    LOG.info("Process RNG file %r...", rngfile)
+    logger.info("Process RNG file %r...", rngfile)
 
     # Remove all blank lines, which makes the output later much more beautiful.
     xmlparser = etree.XMLParser(remove_blank_text=True, remove_comments=True)

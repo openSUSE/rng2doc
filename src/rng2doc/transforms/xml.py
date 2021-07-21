@@ -1,9 +1,5 @@
 """Transform dictionary and functions for XML
 """
-
-# Standard Library
-import logging
-
 # Third Party Libraries
 from lxml import etree
 
@@ -18,8 +14,6 @@ from ..common import (A_DOC,
                       RNG_PARAM,
                       RNG_TEXT,
                       RNG_VALUE)
-
-LOG = logging.getLogger(__name__)
 
 
 def find_namespace(node):
