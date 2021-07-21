@@ -2,7 +2,6 @@
 """
 
 # Standard Library
-import logging
 from pkg_resources import resource_filename
 
 # Third Party Libraries
@@ -11,10 +10,9 @@ from lxml import etree
 
 # Local imports
 from .common import NSMAP, RNG_ELEMENT, RNG_REF, RNG_VALUE
+from .log import logger
 from .transforms.svg import SVG
 from .transforms.xml import XML
-
-logger = logging.getLogger(__package__)
 
 
 def transform(node, output, **kwargs):

@@ -22,8 +22,8 @@ Options:
 """
 
 # Standard Library
-import logging
 import os
+import logging
 import sys
 import time
 from pkg_resources import resource_filename
@@ -34,6 +34,7 @@ from lxml import etree
 
 # Local imports
 from . import __version__
+from .log import setup_logging
 from .common import LOGLEVELS, errorcode
 from .rng import parse
 
@@ -96,15 +97,6 @@ def output(result, file_path, oformat):
             os.path.join(path, filename), pretty_print=True, xml_declaration=True, encoding="utf-8")
     else:
         print(etree.tostring(result, pretty_print=True, encoding="unicode"))
-
-
-def setup_logging(level):
-    logger = logging.getLogger(__package__)
-    logger.setLevel(level)
-    handler = logging.StreamHandler()
-    handler.setFormatter(logging.Formatter('[%(levelname)s] %(message)s'))
-    logger.addHandler(handler)
-    return logger
 
 
 def main(cliargs=None):
