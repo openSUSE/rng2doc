@@ -13,6 +13,7 @@ from ..common import (A_DOC,
                       RNG_ATTRIBUTE,
                       RNG_CHOICE,
                       RNG_DATA,
+                      RNG_DEFINE,
                       RNG_ELEMENT,
                       RNG_OPTIONAL,
                       RNG_PARAM,
@@ -48,18 +49,28 @@ def transform_element(node, **kwargs):
     """Transforms a RELAX NG element into a new XML structure
     """
     root = kwargs.pop("root", False)
-    uuid = node.get("id")
-    name = node.get("name")
-    if name is None:
-        name = "anyName"
+    dupe = kwargs.pop("dupe", False)
+    attributes = {
+        "id": node.get("id"),
+        "name":  node.get("name"),
+    }
+    parent = node.getparent()
+    if parent is not None and parent.tag == RNG_DEFINE:
+        attributes["define"] = node.getparent().get("name")
+    if dupe:
+        attributes["dupe"] = "true"
+    else:
+        attributes["dupe"] = "false"
+    if attributes["name"] is None:
+        attributes["name"] = "anyName"
     if root:
         namespace = find_namespace(node)
-        element = etree.Element("element", name=name, id=uuid)
+        element = etree.Element("element", **attributes)
         element_namespace = etree.SubElement(element, "namespace")
         if namespace:
             element_namespace.text = namespace
     else:
-        element = etree.Element("child", id=uuid)
+        element = etree.Element("child", id=attributes["id"])
     return element
 
 
