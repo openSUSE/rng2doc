@@ -363,6 +363,10 @@
           position: relative;
       }
 
+      .table-bordered td {
+          overflow-wrap: anywhere;
+      }
+
       #index {
         margin-bottom: 40px;
       }
