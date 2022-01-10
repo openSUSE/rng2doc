@@ -363,6 +363,13 @@
           position: relative;
       }
 
+      .graphviz-svg svg {
+          width: auto;
+          height: auto;
+          max-width: 100%;
+          max-height: 75vh;
+      }
+
       .table-bordered td {
           overflow-wrap: anywhere;
       }
