@@ -22,11 +22,10 @@ Options:
 """
 
 # Standard Library
-import logging
 import os
+import logging
 import sys
 import time
-from logging.config import dictConfig
 from pkg_resources import resource_filename
 
 # Third Party Libraries
@@ -35,11 +34,9 @@ from lxml import etree
 
 # Local imports
 from . import __version__
-from .common import DEFAULT_LOGGING_DICT, LOGLEVELS, errorcode
+from .log import setup_logging
+from .common import LOGLEVELS, errorcode
 from .rng import parse
-
-#: Use __package__, not __name__ here to set overall LOGging level:
-LOG = logging.getLogger(__package__)
 
 
 def parsecli(cliargs=None):
@@ -53,9 +50,6 @@ def parsecli(cliargs=None):
     version = "%s %s" % (__package__, __version__)
     args = docopt(__doc__,
                   argv=cliargs, version=version)
-    dictConfig(DEFAULT_LOGGING_DICT)
-    LOG.setLevel(LOGLEVELS.get(args['-v'], logging.DEBUG))
-
     return args
 
 
@@ -114,12 +108,13 @@ def main(cliargs=None):
     """
     try:
         args = parsecli(cliargs)
+        logger = setup_logging(LOGLEVELS.get(args['-v'], logging.DEBUG))
         if args['--timing']:
             t_perf = time.perf_counter()
             t_proc = time.process_time()
-        LOG.info('%s version: %s', __package__, __version__)
-        LOG.debug('Python version: %s', sys.version.split()[0])
-        LOG.debug("CLI result: %s", args)
+        logger.info('%s version: %s', __package__, __version__)
+        logger.debug('Python version: %s', sys.version.split()[0])
+        logger.debug("CLI result: %s", args)
         checkargs(args)
         result = parse(args['RNGFILE'])
         output(result, args['--output'], args["--output-format"])
@@ -129,24 +124,24 @@ def main(cliargs=None):
             timing_msg = "{:7} (timing): {} perf, {} proc"
             timing_msg = timing_msg.format(__package__, elapsed_time_perf, elapsed_time_proc)
             print(timing_msg, file=sys.stderr)
-        LOG.info("Done.")
+        logger.info("Done.")
         return 0
 
     except DocoptExit as error:
-        LOG.fatal("Need a RELAX NG file.")
+        logger.fatal("Need a RELAX NG file.")
         printable_usage(__doc__)
         return errorcode(error)
 
     except FileNotFoundError as error:
-        LOG.fatal("File not found '%s'", error)
+        logger.fatal("File not found '%s'", error)
         return errorcode(error)
 
     except etree.XMLSyntaxError as error:
-        LOG.fatal("Failed to parse the XML input file  '%s'", error)
+        logger.fatal("Failed to parse the XML input file  '%s'", error)
         return errorcode(error)
 
     except RuntimeError as error:
-        LOG.fatal("Something failed  '%s'", error)
+        logger.fatal("Something failed  '%s'", error)
         return 1
 
     except KeyboardInterrupt as error:

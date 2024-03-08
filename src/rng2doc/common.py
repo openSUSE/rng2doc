@@ -23,15 +23,7 @@
 from docopt import DocoptExit
 from lxml.etree import QName, XMLSyntaxError
 
-from logging import (CRITICAL,  # isort:skip
-                     DEBUG,
-                     ERROR,
-                     FATAL,
-                     INFO,
-                     NOTSET,
-                     WARN,
-                     WARNING,
-                     )
+from logging import DEBUG, INFO, WARNING
 
 
 # Error codes
@@ -116,52 +108,3 @@ LOGLEVELS = {None: WARNING,  # 0
              1: INFO,
              2: DEBUG,
              }
-
-#: Map log numbers to log names
-LOGNAMES = {NOTSET: 'NOTSET',      # 0
-            None: 'NOTSET',
-            DEBUG: 'DEBUG',        # 10
-            INFO: 'INFO',          # 20
-            WARN: 'WARNING',       # 30
-            WARNING: 'WARNING',    # 30
-            ERROR: 'ERROR',        # 40
-            CRITICAL: 'CRITICAL',  # 50
-            FATAL: 'CRITICAL',     # 50
-            }
-
-#: Default logging dict for :class:`logging.config.dictConfig`:
-DEFAULT_LOGGING_DICT = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'formatters': {
-        'standard': {
-            # See https://docs.python.org/3.5/library/logging.html#logrecord-attributes
-            'format': '[%(levelname)s] %(name)s::%(funcName)s: %(message)s'
-        },
-        'myformatter': {
-            '()': 'rng2doc.log.CustomConsoleFormatter',
-            'format': '[%(levelname)s] %(message)s',
-        },
-    },
-    'handlers': {
-        'default': {
-            'level': 'NOTSET',
-            'formatter': 'standard',
-            'class': 'logging.StreamHandler',
-            # 'stream': 'ext://sys.stderr',
-            },
-        'myhandler': {
-            'level': 'NOTSET',
-            'formatter': 'myformatter',
-            'class': 'logging.StreamHandler',
-            # 'stream': 'ext://sys.stderr',
-            },
-    },
-    'loggers': {
-        __package__: {
-            'handlers': ['myhandler', ],  # 'default'
-            'level': 'INFO',
-            'propagate': True
-        }
-    }
-}
